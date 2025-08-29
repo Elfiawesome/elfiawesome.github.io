@@ -1,0 +1,28 @@
+pre {
+	background-color: #282c34;
+	/* Slightly different dark for code */
+	color: #abb2bf;
+	/* Light gray for code text */
+	padding: 15px;
+	border-radius: 5px;
+	overflow-x: auto;
+	/* Enable horizontal scroll for long lines of code */
+	margin: 20px 0;
+	font-family: 'Fira Code', 'Cascadia Code', 'Consolas', 'Monaco', monospace;
+	font-size: 0.95em;
+	line-height: 1.4;
+	white-space: pre-wrap;
+	/* Wrap long lines if necessary */
+	word-break: break-all;
+	/* Break words to prevent overflow */
+}
+
+code {
+	font-family: 'Fira Code', 'Cascadia Code', 'Consolas', 'Monaco', monospace;
+	font-size: 0.9em;
+	background-color: rgba(90, 90, 90, 0.3);
+	padding: 2px 4px;
+	border-radius: 3px;
+	color: #d19a66;
+	/* Example color for inline code */
+}

@@ -1,0 +1,120 @@
+/* --- Main Container --- */
+.file-container {
+	display: flex;
+	width: 90vw;
+	/* Take 90% of viewport width */
+	height: 90vh;
+	/* Take 90% of viewport height */
+	max-width: 1400px;
+	/* Max width for larger screens */
+	border: 1px solid var(--border-color-dark);
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+	border-radius: 8px;
+	overflow: hidden;
+	/* Important for inner scrolling */
+}
+
+/* --- Sidebar Styling ---*/
+.sidebar {
+	width: 280px;
+	/* Fixed width for the sidebar */
+	background-color: var(--sidebar-bg-dark);
+	border-right: 1px solid var(--border-color-dark);
+	padding: 20px 0;
+	overflow-y: auto;
+	/* Enable scrolling if directory is long */
+	flex-shrink: 0;
+	/* Prevent sidebar from shrinking */
+}
+
+.sidebar h1 {
+	font-size: 1.8em;
+	padding: 0 20px 15px;
+	color: var(--text-color-light);
+	border-bottom: 1px solid var(--border-color-dark);
+	margin-bottom: 15px;
+}
+
+.sidebar ul {
+	list-style: none;
+	padding: 0;
+}
+
+.sidebar li a {
+	display: block;
+	/* Make the entire list item clickable */
+	padding: 10px 20px;
+	text-decoration: none;
+	color: var(--link-color-default);
+	transition: background-color 0.2s ease-in-out;
+}
+
+.sidebar h1:hover,
+.sidebar li a:hover,
+.sidebar li a:focus {
+	background-color: var(--link-hover-bg);
+	color: var(--text-color-light);
+	outline: none;
+	/* Remove default focus outline */
+}
+
+.sidebar h1,
+.sidebar li a,
+.sidebar li a {
+	transition: background-color 0.2s ease-in-out;
+}
+
+
+/* Misc responsive stuff */
+@media (max-width: 768px) {
+	.file-container {
+		flex-direction: column;
+		/* Stack sidebar and content vertically */
+		width: 100vw;
+		height: 100vh;
+		border-radius: 0;
+	}
+
+	.sidebar {
+		width: 100%;
+		/* Sidebar takes full width */
+		height: auto;
+		/* Allow sidebar to shrink/grow */
+		max-height: 30vh;
+		/* Max height for sidebar on mobile */
+		border-right: none;
+		border-bottom: 1px solid var(--border-color-dark);
+		padding: 15px 0;
+	}
+
+	.sidebar h1 {
+		text-align: center;
+		padding-bottom: 10px;
+		margin-bottom: 10px;
+	}
+
+	.sidebar nav ul {
+		display: flex;
+		/* Display links horizontally */
+		flex-wrap: wrap;
+		/* Allow links to wrap */
+		justify-content: center;
+	}
+
+	.sidebar li {
+		margin: 0 5px;
+	}
+
+	.sidebar li a {
+		padding: 8px 12px;
+		font-size: 0.9em;
+		border-radius: 4px;
+		/* Make links look like buttons */
+		background-color: #333;
+		color: var(--link-color-default);
+	}
+
+	.sidebar li a:hover {
+		background-color: #444;
+	}
+}

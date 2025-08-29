@@ -1,0 +1,123 @@
+/* --- Base --- */
+:root {
+	--background-color: #121212;
+	--primary-text-color: #e0e0e0;
+	--secondary-text-color: #b3b3b3;
+	--accent-color: #bb86fc;
+	--hover-color: #d1b3ff;
+	--card-background-color: #1e1e1e;
+	--border-color: #2c2c2c;
+	--font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	font-family: var(--font-family);
+	background-color: var(--background-color);
+	color: var(--primary-text-color);
+	line-height: 1.6;
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+	padding: 0 5%;
+}
+
+/* --- Headers --- */
+h1,
+h2 {
+	color: var(--accent-color);
+	margin-bottom: 1rem;
+}
+
+h1 {
+	font-size: 2.5rem;
+	text-align: center;
+	margin-bottom: 0.5rem;
+}
+
+h2 {
+	font-size: 1.8rem;
+	border-bottom: 2px solid var(--border-color);
+	padding-bottom: 0.5rem;
+}
+
+
+/* --- Texts --- */
+p {
+	color: var(--secondary-text-color);
+	margin-bottom: 1rem;
+}
+
+/* Links */
+a {
+	color: var(--accent-color);
+	text-decoration: none;
+	transition: color 0.3s ease;
+}
+
+a:hover {
+	color: var(--hover-color);
+}
+
+ul {
+	list-style: none;
+}
+
+/* --- Header n Footer ---  */
+header,
+footer {
+	text-align: center;
+	padding: 2rem 0;
+}
+
+header p {
+	font-size: 1.2rem;
+	color: var(--secondary-text-color);
+}
+
+footer {
+	margin-top: auto;
+	padding: 1.5rem 0;
+	font-size: 0.9rem;
+	color: var(--secondary-text-color);
+}
+
+/* Main Content and Sections */
+main {
+	width: 100%;
+	max-width: 800px;
+	margin: 0 auto;
+	flex-grow: 1;
+}
+
+section {
+	background-color: var(--card-background-color);
+	margin-bottom: 2rem;
+	padding: 2rem;
+	border-radius: 8px;
+	border: 1px solid var(--border-color);
+	transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+section:hover {
+	transform: translateY(-5px);
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Lists and Links within Sections */
+section ul {
+	padding-left: 1rem;
+}
+
+section ul li {
+	margin-bottom: 0.5rem;
+}
+
+section ul li a {
+	font-weight: bold;
+}

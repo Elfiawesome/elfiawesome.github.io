@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Minimal Dark Mode File Browser</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+	<div class="container">
+		<aside class="sidebar">
+			<h1>Files</h1>
+			<nav>
+				<ul>
+					<li><a href="#content-image1" class="file-link">🖼️ Image 1.jpg</a></li>
+					<li><a href="#content-document1" class="file-link">📄 Document A.txt</a></li>
+					<li><a href="#content-image2" class="file-link">🖼️ Image 2.png</a></li>
+					<li><a href="#content-document2" class="file-link">📄 Another Doc.md</a></li>
+					<li><a href="#content-code" class="file-link">💻 Script.py</a></li>
+				</ul>
+			</nav>
+		</aside>
+
+		<main class="content">
+			<!-- Default content to show if no hash is present in URL -->
+			<section id="default-content" class="content-item default">
+				<h2>Welcome!</h2>
+				<p>Click a file on the left to view its content here.</p>
+				<img src="https://via.placeholder.com/600x400/222222/bbbbbb?text=Select+a+File"
+					alt="Select a File Placeholder" class="placeholder-img">
+				<p>This is a simple HTML/CSS file browser. Without JavaScript, dynamic content loading isn't possible,
+					so all content is pre-loaded on the page and revealed using CSS's <code>:target</code> pseudo-class.
+				</p>
+			</section>
+
+			<!-- Content for Image 1 -->
+			<section id="content-image1" class="content-item">
+				<h2>Image 1.jpg</h2>
+				<img src="https://via.placeholder.com/800x600/0d47a1/ffffff?text=Beautiful+Placeholder+Image+1"
+					alt="A serene landscape placeholder image.">
+				<p>This is the description for Image 1. It's a placeholder to demonstrate how images would be displayed.
+					Images are scaled to fit the content area.</p>
+				<p>This could be a photo, a diagram, or any visual asset related to your project. The aspect ratio is
+					maintained, and it resizes responsively.</p>
+			</section>
+
+			<!-- Content for Document A -->
+			<section id="content-document1" class="content-item">
+				<h2>Document A.txt</h2>
+				<p>This is the content for Document A. It's a plain text file, perhaps containing notes, a simple
+					README, or raw data.</p>
+				<pre>
+Line 1: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+Line 2: Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+Line 3: Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
+Line 4: Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.
+                </pre>
+				<p>More text can follow here, detailing the document's purpose or content. This section can handle long
+					blocks of text gracefully.</p>
+			</section>
+
+			<!-- Content for Image 2 -->
+			<section id="content-image2" class="content-item">
+				<h2>Image 2.png</h2>
+				<img src="https://via.placeholder.com/700x500/1b5e20/ffffff?text=Another+Placeholder+Image+2"
+					alt="An abstract design placeholder image.">
+				<p>Another example of an image display. This one has different dimensions and content to show
+					versatility. Ideal for diagrams, charts, or other visual information.</p>
+			</section>
+
+			<!-- Content for Another Doc -->
+			<section id="content-document2" class="content-item">
+				<h2>Another Doc.md</h2>
+				<h3>Markdown Preview Example</h3>
+				<p>This could represent a Markdown file, showing how formatted text might look.</p>
+				<ul>
+					<li><strong>Bold Text:</strong> Important highlight.</li>
+					<li><em>Italic Text:</em> For emphasis.</li>
+					<li><code>Inline Code</code> snippets are supported.</li>
+				</ul>
+				<p>A longer paragraph for demonstrating text flow and readability in the dark mode environment.</p>
+			</section>
+
+			<!-- Content for Script.py -->
+			<section id="content-code" class="content-item">
+				<h2>Script.py</h2>
+				<h3>Python Example</h3>
+				<pre><code class="language-python">
+# This is a simple Python script example
+def greet(name):
+    """
+    Greets the given name.
+    """
+    print(f"Hello, {name}!")
+
+if __name__ == "__main__":
+    greet("World")
+    greet("Minimalist User")
+                </code></pre>
+				<p>Preformatted text blocks are great for showing code, configuration files, or any text where
+					whitespace and line breaks are important.</p>
+			</section>
+
+		</main>
+	</div>
+</body>
+
+</html>

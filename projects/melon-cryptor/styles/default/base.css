@@ -1,0 +1,33 @@
+:root {
+	--bg-color-dark: #1a1a1a;
+	--text-color-light: #e0e0e0;
+	--sidebar-bg-dark: #222222;
+	--border-color-dark: #333333;
+	--link-color-default: #8ab4f8;
+
+	--link-hover-bg: #333333;
+	--scroll-thumb-color: #555555;
+	--scroll-track-color: #222222;
+}
+
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	background-color: var(--bg-color-dark);
+	color: var(--text-color-light);
+	line-height: 1.6;
+	display: flex;
+	/* Use flexbox to center content if container is smaller than viewport */
+	justify-content: center;
+	align-items: center;
+	min-height: 100vh;
+	/* Ensure body takes full viewport height */
+	
+	overflow: hidden;
+	/* Prevent body scroll if container has scrollbars */
+}
