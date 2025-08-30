@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Minimal Dark Mode File Browser</title>
+	<link rel="stylesheet" href="styles/default/base.css">
+	<link rel="stylesheet" href="styles/default/scrollbar.css">
+
+	<link rel="stylesheet" href="styles/file-explorer/file-explorer.css">
+	<link rel="stylesheet" href="styles/file-explorer/login-form.css">
+
+	<link rel="stylesheet" href="styles/content/content.css">
+	<link rel="stylesheet" href="styles/content/code-block-styling.css">
+
+	<script src="scripts/file-explorer.js" defer></script>
+</head>
+
+<body>
+	<div class="login-container" style="display: block;">
+		<h2>Enter Vault Details</h2>
+		<form id="vault-form">
+			<input type="text" id="vault-link-input" placeholder="https://example.com/vault" value="">
+			<input type="password" id="password-input" placeholder="password" value="">
+			<button id="load-vault-btn">Load Vault</button>
+			<button id="cancel-vault-btn">Cancel</button>
+		</form>
+	</div>
+
+	<div class="file-container">
+		<aside class="sidebar">
+			<h1 id="files-title">Files</h1>
+			<nav>
+				<ul id="sidebar-list">
+					<!-- <li><a class="file-link">🖼️ Image 1.jpg</a></li>
+					<li><a class="file-link">📄 Document A.txt</a></li>
+					<li><a class="file-link">🖼️ Image 2.png</a></li>
+					<li><a class="file-link">📄 Another Doc.md</a></li>
+					<li><a class="file-link">💻 Script.py</a></li> -->
+				</ul>
+			</nav>
+		</aside>
+
+		<main class="content" id="main-content">
+
+
+		</main>
+	</div>
+</body>
+
+</html>
