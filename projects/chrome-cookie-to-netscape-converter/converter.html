@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Cookie Text to Netscape Format Converter</title>
+	<link rel="stylesheet" href="style.css">
+	<script src="script.js"></script>
+</head>
+
+<body>
+	<div class="container">
+		<h1>Cookie Text to Netscape Format Converter</h1>
+		<p>Paste your tab-separated cookie data into the text area below and click "Convert".</p>
+		<textarea id="input-text" rows="15" placeholder="Paste your cookie data here..."></textarea>
+		<div class="buttons">
+			<button id="convert-button">Convert</button>
+			<button id="download-button" disabled>Download as .txt</button>
+			<button id="copy-text-button" disabled>Copy</button>
+		</div>
+		<h2>Output (Netscape Format)</h2>
+		<pre id="output-text"></pre>
+	</div>
+</body>
+
+</html>
