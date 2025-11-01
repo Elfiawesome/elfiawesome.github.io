@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>SPDS Formation Previewer</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+	<!-- NEW: Added an overlay for mobile view -->
+	<div id="overlay"></div>
+
+	<div id="app-container">
+		<div id="controls">
+			<!-- NEW: Added a header inside controls for the title and close button -->
+			<div class="controls-header">
+				<h1>Controls</h1>
+				<button id="close-controls-btn" title="Close Controls">&times;</button>
+			</div>
+
+			<!-- Formation 1 -->
+			<div class="formation-group">
+				<label for="f1-visible"><input type="checkbox" id="f1-visible" checked> Visible</label>
+				<details open>
+					<summary>Formation 1 (12-Man Block)</summary>
+					<div class="control-group">
+						<label for="f1-midX">Midpoint X:</label>
+						<input type="number" id="f1-midX" min="0" max="60" value="30" step="0.5">
+					</div>
+					<div class="control-group">
+						<label for="f1-midY">Midpoint Y:</label>
+						<input type="number" id="f1-midY" min="0" max="60" value="35" step="0.5">
+					</div>
+					<div class="control-group">
+						<label for="f1-gap">Gap Multiplier:</label>
+						<input type="number" id="f1-gap" min="1" max="10" value="6" step="0.1">
+					</div>
+					<div class="control-group">
+						<label for="f1-color">Color:</label>
+						<input type="color" id="f1-color" value="#fcfc03">
+					</div>
+					<div class="control-group">
+						<label for="f1-center"><input type="checkbox" id="f1-center" checked> Center Formation</label>
+					</div>
+				</details>
+			</div>
+
+			<!-- Formation 2 -->
+			<div class="formation-group">
+				<label for="f2-visible"><input type="checkbox" id="f2-visible" checked> Visible</label>
+				<details>
+					<summary>Formation 2 (Diamond)</summary>
+					<div class="control-group">
+						<label for="f2-midX">Midpoint X:</label>
+						<input type="number" id="f2-midX" min="0" max="60" value="30" step="0.5">
+					</div>
+					<div class="control-group">
+						<label for="f2-midY">Midpoint Y:</label>
+						<input type="number" id="f2-midY" min="0" max="60" value="35" step="0.5">
+					</div>
+					<div class="control-group">
+						<label for="f2-inner-gap">Inner Spacing:</label>
+						<input type="number" id="f2-inner-gap" min="0.1" max="5" value="1" step="0.1">
+					</div>
+					<div class="control-group">
+						<label for="f2-outer-gap">Outer Spacing:</label>
+						<input type="number" id="f2-outer-gap" min="0.1" max="5" value="1.5" step="0.1">
+					</div>
+					<div class="control-group">
+						<label for="f2-gap-mult">Gap Multiplier:</label>
+						<input type="number" id="f2-gap-mult" min="1" max="10" value="4" step="0.1">
+					</div>
+					<div class="control-group">
+						<label for="f2-color">Color:</label>
+						<input type="color" id="f2-color" value="#0062ff">
+					</div>
+					<div class="control-group">
+						<label for="f2-center"><input type="checkbox" id="f2-center" checked> Center Formation</label>
+					</div>
+				</details>
+			</div>
+
+
+			<!-- Formation 3 -->
+			<div class="formation-group">
+				<label for="f3-visible"><input type="checkbox" id="f3-visible" checked> Visible</label>
+				<details>
+					<summary>Formation 3 (V-Shape)</summary>
+					<div class="control-group">
+						<label for="f3-midX">Midpoint X:</label>
+						<input type="number" id="f3-midX" min="0" max="60" value="30" step="0.5">
+					</div>
+					<div class="control-group">
+						<label for="f3-midY">Midpoint Y:</label>
+						<input type="number" id="f3-midY" min="0" max="60" value="37" step="0.5">
+					</div>
+					<div class="control-group">
+						<label for="f3-gap">Gap Multiplier:</label>
+						<input type="number" id="f3-gap" min="1" max="10" value="6" step="0.1">
+					</div>
+					<div class="control-group">
+						<label for="f3-color">Color:</label>
+						<input type="color" id="f3-color" value="#ff0000">
+					</div>
+					<div class="control-group">
+						<label for="f3-center"><input type="checkbox" id="f3-center" checked> Center Formation</label>
+					</div>
+				</details>
+			</div>
+
+			<!-- Silent Wave -->
+			<div class="formation-group">
+				<label for="sw-visible"><input type="checkbox" id="sw-visible" checked> Visible</label>
+				<details>
+					<summary>Silent Wave</summary>
+					<div class="control-group">
+						<label for="sw-midX">Midpoint X:</label>
+						<input type="number" id="sw-midX" min="0" max="60" value="30" step="0.5">
+					</div>
+					<div class="control-group">
+						<label for="sw-midY">Midpoint Y:</label>
+						<input type="number" id="sw-midY" min="0" max="60" value="40" step="0.5">
+					</div>
+					<div class="control-group">
+						<label for="sw-gap">Gap:</label>
+						<input type="number" id="sw-gap" min="1" max="10" value="3" step="0.1">
+					</div>
+					<div class="control-group">
+						<label for="sw-totalMen">Total Men:</label>
+						<input type="number" id="sw-totalMen" min="1" max="24" value="12">
+					</div>
+					<div class="control-group">
+						<label for="sw-color">Color:</label>
+						<input type="color" id="sw-color" value="#1eff00">
+					</div>
+				</details>
+			</div>
+
+			<!-- Saturn -->
+			<div class="formation-group">
+				<label for="sat-visible"><input type="checkbox" id="sat-visible" checked> Visible</label>
+				<details>
+					<summary>Saturn</summary>
+					<div class="control-group">
+						<label for="sat-midX">Midpoint X:</label>
+						<input type="number" id="sat-midX" min="0" max="60" value="30" step="0.5">
+					</div>
+					<div class="control-group">
+						<label for="sat-midY">Midpoint Y:</label>
+						<input type="number" id="sat-midY" min="0" max="60" value="40" step="0.5">
+					</div>
+					<div class="control-group">
+						<label for="sat-throw-gap">Throw Gap:</label>
+						<input type="number" id="sat-throw-gap" min="1" max="15" value="6" step="0.1">
+					</div>
+					<div class="control-group">
+						<label for="sat-gap">Vertical Gap:</label>
+						<input type="number" id="sat-gap" min="1" max="10" value="3" step="0.1">
+					</div>
+					<div class="control-group">
+						<label for="sat-totalMen">Total Men:</label>
+						<input type="number" id="sat-totalMen" min="1" max="24" value="12">
+					</div>
+					<div class="control-group">
+						<label for="sat-color">Color:</label>
+						<input type="color" id="sat-color" value="#00733f">
+					</div>
+				</details>
+			</div>
+
+
+			<button id="download-btn">Download SVG</button>
+
+		</div>
+		<div id="preview-container">
+			<div id="svg-output"></div>
+		</div>
+	</div>
+
+	<!-- NEW: Button to toggle controls on mobile -->
+	<button id="toggle-controls-btn" title="Toggle Controls">
+		<!-- A simple SVG for the settings icon -->
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="24px" height="24px">
+			<path
+				d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.44,0.17-0.48,0.41L9.22,5.72C8.63,5.96,8.1,6.29,7.6,6.67L5.21,5.71C4.99,5.62,4.74,5.7,4.62,5.92L2.7,9.24 c-0.11,0.2-0.06,0.47,0.12,0.61L4.85,11c-0.04,0.3-0.06,0.61-0.06,0.94c0,0.32,0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.38,2.91 c0.04,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.48-0.41l0.38-2.91c0.59-0.24,1.12-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.11-0.2,0.06-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z" />
+		</svg>
+	</button>
+
+	<script src="script.js"></script>
+</body>
+
+</html>
