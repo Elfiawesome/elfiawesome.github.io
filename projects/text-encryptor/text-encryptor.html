@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Text Encryptor</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+	<main class="container">
+		<h1>Text Encryptor (AES-GCM)</h1>
+		<p>lol</p>
+
+		<label for="text-input">Your Text:</label>
+		<textarea id="text-input" rows="6" placeholder="Type or paste your secret message here..."></textarea>
+
+		<label for="password-input">Password (Key):</label>
+		<input type="password" id="password-input" placeholder="Enter your secret password">
+
+		<div class="buttons">
+			<button id="encrypt-btn">Encrypt</button>
+			<button id="decrypt-btn">Decrypt</button>
+		</div>
+
+		<label for="output-area">Output:</label>
+		<textarea id="output-area" rows="6" readonly placeholder="Result will appear here..."></textarea>
+
+		<div id="status" class="status"></div>
+
+	</main>
+
+	<script src="script.js"></script>
+</body>
+
+</html>
