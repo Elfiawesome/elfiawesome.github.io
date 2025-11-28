@@ -1,0 +1,1889 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>STREET BATTLE</title>
+	<link href="https://linusg.github.io/serenityos-emoji-font/SerenityOS-Emoji.css" rel="stylesheet">
+	<style>
+		:root {
+			/* Dark Mode Palette */
+			--bg: #050505;
+			--panel: #1e1e1e;
+			--text: #e0e0e0;
+			--text-dim: #a0a0a0;
+			--accent: #ff4757;
+			--ap-active: #3742fa;
+			--ap-empty: #2f3542;
+			--card-bg: #222f3e;
+			--card-border: #576574;
+			--font-main: "SerenityOS Emoji", "Helvetica Neue", Arial, sans-serif;
+			/* Rarity Colors */
+			--common: #7f8fa6;
+			--rare: #0984e3;
+			--epic: #8e44ad;
+			--legend: #f1c40f;
+			/* Zones */
+			--zone-bg: rgba(255, 255, 255, 0.03);
+			--zone-border: #444;
+		}
+
+		body {
+			background-color: var(--bg);
+			color: var(--text);
+			font-family: var(--font-main);
+			margin: 0;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 100vh;
+			overflow: hidden;
+			user-select: none;
+		}
+
+		#game-container {
+			width: 1000px;
+			height: 750px;
+			border: 2px solid #333;
+			border-radius: 8px;
+			position: relative;
+			background: #121212;
+			display: flex;
+			flex-direction: column;
+			box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+		}
+
+		/* Screens */
+		.screen {
+			display: none;
+			width: 100%;
+			height: 100%;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			position: absolute;
+			top: 0;
+			left: 0;
+			background: var(--bg);
+			z-index: 10;
+			color: #fff;
+		}
+
+		.active {
+			display: flex;
+		}
+
+		/* Map */
+		.map-node {
+			font-size: 1.2rem;
+			cursor: pointer;
+			padding: 15px;
+			margin: 10px;
+			border: 1px solid #444;
+			width: 220px;
+			text-align: center;
+			background: #2d3436;
+			color: #ccc;
+			border-radius: 4px;
+			transition: 0.2s;
+			font-weight: bold;
+		}
+
+		.map-node:hover {
+			background: #eee;
+			color: #000;
+			transform: scale(1.05);
+			box-shadow: 0 0 15px #fff;
+		}
+
+		/* Battle UI */
+		#battle-screen {
+			display: none;
+			flex-direction: column;
+			justify-content: space-between;
+			padding: 10px;
+			box-sizing: border-box;
+			z-index: 5;
+			height: 100%;
+			background: #121212;
+		}
+
+		#battle-screen.active {
+			display: flex;
+		}
+
+		.zone {
+			display: flex;
+			gap: 10px;
+			padding: 15px;
+			min-height: 150px;
+			align-items: center;
+			justify-content: center;
+			border: 2px dashed var(--zone-border);
+			background: var(--zone-bg);
+			border-radius: 8px;
+			position: relative;
+		}
+
+		.hud {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			width: 100%;
+			padding: 10px 20px;
+			background: #1a1a1a;
+			border-bottom: 1px solid #333;
+			font-size: 1.2rem;
+			box-sizing: border-box;
+		}
+
+		/* Cards & Units */
+		.card {
+			width: 110px;
+			height: 170px;
+			background: var(--card-bg);
+			border: 2px solid var(--common);
+			border-radius: 6px;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: space-between;
+			padding: 5px;
+			font-size: 0.8rem;
+			cursor: pointer;
+			transition: transform 0.2s, filter 0.2s;
+			position: relative;
+			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+			color: #ecf0f1;
+		}
+
+		.card.common {
+			border-color: var(--common);
+		}
+
+		.card.rare {
+			border-color: var(--rare);
+			box-shadow: 0 0 8px rgba(9, 132, 227, 0.4);
+		}
+
+		.card.epic {
+			border-color: var(--epic);
+			box-shadow: 0 0 10px rgba(142, 68, 173, 0.4);
+		}
+
+		.card.legend {
+			border-color: var(--legend);
+			box-shadow: 0 0 12px rgba(241, 196, 15, 0.4);
+		}
+
+		.card:hover {
+			transform: translateY(-10px);
+			z-index: 100;
+			border-color: #fff;
+			background: #2c3e50;
+		}
+
+		.card.disabled {
+			filter: grayscale(100%) brightness(0.5);
+			opacity: 0.6;
+			cursor: not-allowed;
+			transform: none;
+		}
+
+		.card-sprite {
+			font-size: 3.5rem;
+			margin-top: 5px;
+			text-shadow: 0 4px 5px rgba(0, 0, 0, 0.5);
+		}
+
+		.card-stats {
+			display: flex;
+			justify-content: space-between;
+			width: 100%;
+			font-weight: 900;
+			font-size: 1.2rem;
+			padding: 0 8px;
+			box-sizing: border-box;
+			font-family: monospace;
+		}
+
+		.stat-atk {
+			color: #ff6b6b;
+			text-shadow: 0 0 5px rgba(255, 71, 87, 0.5);
+		}
+
+		.stat-hp {
+			color: #1dd1a1;
+			text-shadow: 0 0 5px rgba(29, 209, 161, 0.5);
+		}
+
+		.cost-badge {
+			position: absolute;
+			top: -10px;
+			left: -10px;
+			background: var(--ap-active);
+			color: #fff;
+			border: 2px solid #181818;
+			width: 28px;
+			height: 28px;
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-weight: bold;
+			font-size: 1.1rem;
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+		}
+
+		.card-desc {
+			font-size: 0.65rem;
+			text-align: center;
+			color: #b2bec3;
+			height: 35px;
+			overflow: hidden;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 100%;
+			background: rgba(0, 0, 0, 0.2);
+			border-radius: 4px;
+			padding: 2px;
+			line-height: 1.1;
+		}
+
+		.rarity-badge {
+			font-size: 0.6rem;
+			text-transform: uppercase;
+			font-weight: bold;
+			margin-bottom: 2px;
+		}
+
+		.common .rarity-badge {
+			color: #b2bec3;
+		}
+
+		.rare .rarity-badge {
+			color: #74b9ff;
+		}
+
+		.epic .rarity-badge {
+			color: #a29bfe;
+		}
+
+		.legend .rarity-badge {
+			color: #ffeaa7;
+		}
+
+		/* Unit */
+		.unit {
+			width: 100px;
+			height: 120px;
+			background: #2f3640;
+			border: 2px solid #555;
+			border-radius: 6px;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			position: relative;
+			transition: 0.2s;
+			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+			color: #fff;
+		}
+
+		.unit.enemy {
+			border-color: var(--accent);
+		}
+
+		.unit.player {
+			border-color: var(--ap-active);
+		}
+
+		.unit.taunt {
+			border: 3px solid #f1c40f;
+			box-shadow: 0 0 15px #f1c40f;
+		}
+
+		/* Taunt Visual */
+		.unit:hover .unit-tooltip {
+			display: block;
+		}
+
+		.unit-tooltip {
+			display: none;
+			position: absolute;
+			bottom: 115%;
+			left: 50%;
+			transform: translateX(-50%);
+			background: #000;
+			border: 1px solid #444;
+			color: #fff;
+			padding: 8px;
+			width: 160px;
+			text-align: center;
+			font-size: 0.7rem;
+			z-index: 200;
+			pointer-events: none;
+			border-radius: 4px;
+			box-shadow: 0 2px 10px #000;
+		}
+
+		/* Mana / AP Pips */
+		.ap-container {
+			display: flex;
+			gap: 4px;
+		}
+
+		.ap-pip {
+			width: 16px;
+			height: 16px;
+			border-radius: 50%;
+			border: 2px solid #555;
+			background-color: var(--ap-empty);
+		}
+
+		.ap-pip.filled {
+			background-color: var(--ap-active);
+			border-color: #fff;
+			box-shadow: 0 0 5px var(--ap-active);
+		}
+
+		/* Animations */
+		@keyframes shake {
+			0% {
+				transform: translate(1px, 1px);
+			}
+
+			50% {
+				transform: translate(-1px, -1px);
+			}
+
+			100% {
+				transform: translate(1px, 1px);
+			}
+		}
+
+		.shake {
+			animation: shake 0.2s;
+			animation-iteration-count: 3;
+		}
+
+		/* Floating Text */
+		.float-text {
+			position: absolute;
+			font-size: 2rem;
+			font-weight: 900;
+			text-shadow: 2px 2px 0 #000;
+			animation: floatUp 1s forwards;
+			pointer-events: none;
+			z-index: 100;
+		}
+
+		.dmg {
+			color: #ff4757;
+		}
+
+		.heal {
+			color: #1dd1a1;
+		}
+
+		.buff {
+			color: #2ed573;
+			font-size: 1.5rem;
+		}
+
+		.mana {
+			color: #3742fa;
+		}
+
+		@keyframes floatUp {
+			0% {
+				transform: translateY(0);
+				opacity: 1;
+			}
+
+			100% {
+				transform: translateY(-50px);
+				opacity: 0;
+			}
+		}
+
+		button {
+			background: #333;
+			color: #fff;
+			border: 1px solid #555;
+			padding: 12px 24px;
+			font-family: var(--font-main);
+			font-size: 1rem;
+			font-weight: bold;
+			cursor: pointer;
+			margin-top: 10px;
+			border-radius: 4px;
+			transition: 0.2s;
+		}
+
+		button:hover {
+			background: #fff;
+			color: #000;
+			border-color: #fff;
+		}
+
+		button:disabled {
+			opacity: 0.3;
+			cursor: default;
+			background: #222;
+			border-color: #333;
+			color: #777;
+		}
+
+		#reward-container {
+			display: flex;
+			gap: 15px;
+			flex-wrap: wrap;
+			justify-content: center;
+			overflow-y: auto;
+			max-height: 500px;
+			padding: 10px;
+		}
+
+		h1 {
+			margin: 0 0 20px 0;
+			text-transform: uppercase;
+			letter-spacing: 2px;
+			color: #fff;
+			text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+		}
+
+		#deck-counter {
+			position: absolute;
+			right: 10px;
+			bottom: 10px;
+			background: #222;
+			color: #fff;
+			width: 50px;
+			height: 70px;
+			border-radius: 4px;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			font-size: 0.8rem;
+			border: 1px solid #555;
+			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+		}
+
+		.choice-btn {
+			width: 180px;
+			padding: 20px;
+			margin: 10px;
+			font-size: 1.2rem;
+			background: #222;
+			color: #fff;
+			border: 1px solid #555;
+			display: inline-block;
+			cursor: pointer;
+			transition: 0.2s;
+		}
+
+		.choice-btn:hover {
+			background: #fff;
+			color: #000;
+		}
+
+		/* Warehouse Theme */
+		.warehouse-theme {
+			background: #1b262c !important;
+			color: #fff !important;
+		}
+
+		.warehouse-theme button {
+			background: #0f3460;
+			border-color: #16213e;
+		}
+
+		.warehouse-theme button:hover {
+			background: #e94560;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="game-container">
+		<!-- Main Menu -->
+		<div id="screen-menu" class="screen active">
+			<h1 style="font-size: 3rem; color: var(--accent);">OVERFLIGHT</h1>
+			<div style="margin-bottom: 20px; color: #888;">STREET BATTLE</div>
+			<button onclick="GAME.init()">ENTER THE CITY</button>
+		</div>
+		<!-- Map Screen -->
+		<div id="screen-map" class="screen">
+			<h1 id="map-title">Next Sector</h1>
+			<div id="map-nodes"></div>
+		</div>
+		<!-- Victory Choice Screen -->
+		<div id="screen-choice" class="screen">
+			<h1>Victory!</h1>
+			<div style="display:flex;">
+				<div class="choice-btn" onclick="GAME.prepBattleReward()">
+					🤝 RECRUIT
+					<div style="font-size:0.8rem; margin-top:5px; color:#aaa;">Add card</div>
+				</div>
+				<div class="choice-btn" onclick="GAME.prepFireReward()">
+					👋 FIRE
+					<div style="font-size:0.8rem; margin-top:5px; color:#aaa;">Remove card</div>
+				</div>
+				<div class="choice-btn" onclick="GAME.nextLevel()">
+					⏩ SKIP
+					<div style="font-size:0.8rem; margin-top:5px; color:#aaa;">Take nothing</div>
+				</div>
+			</div>
+		</div>
+		<!-- Reward/Remove Selection Screen -->
+		<div id="screen-reward" class="screen">
+			<h1 id="reward-title">Select Card</h1>
+			<div id="reward-container"></div>
+			<div style="display:flex; gap:10px; margin-top: 10px;">
+				<button id="btn-reward-back" onclick="UI.showScreen('screen-choice')">BACK</button>
+				<button id="btn-reward-skip" onclick="GAME.nextLevel()">SKIP</button>
+			</div>
+		</div>
+		<!-- Battle Screen -->
+		<div id="battle-screen">
+			<div class="hud">
+				<div style="display:flex; align-items:center; gap:10px;">
+					<span style="font-size:2rem">👺</span>
+					<div style="display:flex; flex-direction:column;">
+						<span style="font-size:0.7rem; color:#888; font-weight:bold;">ENEMY</span>
+						<span id="enemy-name" style="font-weight:bold; color:var(--accent);">Boss</span>
+					</div>
+				</div>
+				<span style="font-size:1.5rem; font-weight:bold;">❤️ <span id="enemy-hp"></span></span>
+			</div>
+			<!-- Enemy Board -->
+			<div id="enemy-board" class="zone"></div>
+			<!-- Player Board -->
+			<div id="player-board" class="zone"></div>
+			<div class="hud">
+				<div style="display:flex; align-items:center; gap:10px;">
+					<span style="font-size:2rem">🧢</span>
+					<div style="display:flex; flex-direction:column;">
+						<span style="font-size:0.7rem; color:#888; font-weight:bold;">YOU</span>
+						<div id="ap-display" class="ap-container"></div>
+					</div>
+				</div>
+				<span style="font-size:1.5rem; font-weight:bold;">❤️ <span id="player-hp"></span></span>
+			</div>
+			<!-- Control Bar -->
+			<div style="padding: 0 10px; display:flex; justify-content: flex-end;">
+				<button id="btn-end-setup" onclick="BATTLE.endSetup()">END TURN</button>
+			</div>
+			<!-- Hand -->
+			<div id="player-hand" class="zone" style="border: none; min-height: 180px; background: transparent;"></div>
+			<!-- Deck Count -->
+			<div id="deck-counter">
+				<div style="font-size:1.5rem;">🃏</div>
+				<span id="deck-num">0</span>
+			</div>
+		</div>
+	</div>
+	<script>
+		/** 
+		* ABILITY SYSTEM
+		*/
+		const ABILITIES = {
+			'none': { name: '', desc: '', trigger: null },
+
+			// --- KEYWORDS ---
+			'taunt': {
+				name: 'Taunt', desc: 'Enemies MUST attack this unit.', trigger: null, isTaunt: true
+			},
+
+			// --- DAMAGE & COMBAT ---
+			'shoot': {
+				name: 'Pistol', desc: 'Deploy: Deal 1 DMG to random enemy.', trigger: 'DEPLOY',
+				effect: async (ctx, u) => {
+					if (ctx.unit.uid !== u.uid) return;
+					const t = rnd(BATTLE.getUnits(u.owner === 'player' ? 'enemy' : 'player'));
+					QUEUE.add(async () => {
+						AUDIO.sfx.gunshot();
+						if (t) await BATTLE.damageUnit(t, 1, u);
+						else await BATTLE.damageHero(u.owner === 'player' ? 'enemy' : 'player', 1);
+					});
+				}
+			},
+			'snipe': {
+				name: 'Snipe', desc: 'Deploy: Deal 3 DMG to random enemy.', trigger: 'DEPLOY',
+				effect: async (ctx, u) => {
+					if (ctx.unit.uid !== u.uid) return;
+					const targets = BATTLE.getUnits(u.owner === 'player' ? 'enemy' : 'player');
+					QUEUE.add(async () => {
+						AUDIO.sfx.gunshot();
+						if (targets.length) await BATTLE.damageUnit(rnd(targets), 3, u);
+						else await BATTLE.damageHero(u.owner === 'player' ? 'enemy' : 'player', 3);
+					});
+				}
+			},
+			'execute': {
+				name: 'Execute', desc: 'Deal double damage to targets under 50% HP.', trigger: null // Handled in logic
+			},
+			'berserk': {
+				name: 'Pain', desc: 'Gain +1 ATK when hit.', trigger: 'TAKE_DAMAGE',
+				effect: async (ctx, u) => {
+					if (ctx.target.uid === u.uid) {
+						QUEUE.add(async () => {
+							u.atk++;
+							UI.showFloatText(u.uid, "+1 ATK", "buff");
+							UI.updateUnit(u);
+						});
+					}
+				}
+			},
+			'revenge': {
+				name: 'Revenge', desc: 'Gain +2 ATK when an ally dies.', trigger: 'DEATH',
+				effect: async (ctx, u) => {
+					if (ctx.unit.owner === u.owner && ctx.unit.uid !== u.uid && u.hp > 0) {
+						QUEUE.add(async () => {
+							u.atk += 2;
+							UI.showFloatText(u.uid, "+2 ATK", "buff");
+							UI.updateUnit(u);
+						});
+					}
+				}
+			},
+			'thorns': {
+				name: 'Spikes', desc: 'Deal 1 DMG to attacker when hit.', trigger: 'TAKE_DAMAGE',
+				effect: async (ctx, u) => {
+					if (ctx.target.uid === u.uid && ctx.source && ctx.source.hp > 0) {
+						QUEUE.add(async () => {
+							await BATTLE.damageUnit(ctx.source, 1, u);
+						});
+					}
+				}
+			},
+			'lifesteal': {
+				name: 'Vampire', desc: 'On Attack: Heal Hero for damage dealt.', trigger: 'ATTACK',
+				effect: async (ctx, u) => {
+					if (ctx.source.uid === u.uid) {
+						// Heals hero based on unit ATK
+						QUEUE.add(async () => {
+							await BATTLE.healHero(u.owner, u.atk);
+						});
+					}
+				}
+			},
+			'last_laugh': {
+				name: 'Kaboom', desc: 'Death: Deal 3 DMG to all enemies.', trigger: 'DEATH',
+				effect: async (ctx, u) => {
+					if (ctx.unit.uid !== u.uid) return;
+					QUEUE.add(async () => {
+						AUDIO.sfx.explosion();
+						const enemies = BATTLE.getUnits(u.owner === 'player' ? 'enemy' : 'player');
+						for (let e of enemies) await BATTLE.damageUnit(e, 3, u);
+						await BATTLE.damageHero(u.owner === 'player' ? 'enemy' : 'player', 3);
+					});
+				}
+			},
+
+			// --- BUFFS & SUPPORT ---
+			'rally': {
+				name: 'Rally', desc: 'Deploy: Give all allies +1/+1.', trigger: 'DEPLOY',
+				effect: async (ctx, u) => {
+					if (ctx.unit.uid !== u.uid) return;
+					QUEUE.add(async () => {
+						const allies = BATTLE.getUnits(u.owner).filter(a => a.uid !== u.uid);
+						AUDIO.sfx.buff();
+						for (let a of allies) {
+							a.atk++; a.hp++; a.maxHp++;
+							UI.showFloatText(a.uid, "+1/+1", "buff");
+							UI.updateUnit(a);
+						}
+					});
+				}
+			},
+			'medic': {
+				name: 'Triage', desc: 'Deploy: Heal Hero 5 HP.', trigger: 'DEPLOY',
+				effect: async (ctx, u) => {
+					if (ctx.unit.uid !== u.uid) return;
+					QUEUE.add(async () => {
+						await BATTLE.healHero(u.owner, 5);
+					});
+				}
+			},
+			'regen': {
+				name: 'Regen', desc: 'End Turn: Heal self 2 HP.', trigger: 'PHASE_END',
+				effect: async (ctx, u) => {
+					if (u.hp > 0) {
+						QUEUE.add(async () => {
+							if (u.hp < u.maxHp) {
+								u.hp = Math.min(u.maxHp, u.hp + 2);
+								UI.showFloatText(u.uid, "+2", "heal");
+								UI.updateUnit(u);
+							}
+						});
+					}
+				}
+			},
+			'grow': {
+				name: 'Grow', desc: 'End Turn: Gain +1/+1.', trigger: 'PHASE_END',
+				effect: async (ctx, u) => {
+					if (u.hp > 0) {
+						QUEUE.add(async () => {
+							u.atk++; u.hp++; u.maxHp++;
+							UI.showFloatText(u.uid, "+1/+1", "buff");
+							UI.updateUnit(u);
+						});
+					}
+				}
+			},
+
+			// --- MANA & ECONOMY ---
+			'generator': {
+				name: 'Power', desc: 'Turn Start: +1 Max AP.', trigger: 'CALC_MANA',
+				effect: async (ctx, u) => {
+					if (u.hp > 0 && ctx.owner === u.owner) {
+						ctx.amount += 1;
+						QUEUE.add(async () => UI.showFloatText(u.uid, "+1 AP", "mana"));
+					}
+				}
+			},
+			'investor': {
+				name: 'Invest', desc: 'Deploy: Draw a card.', trigger: 'DEPLOY',
+				effect: async (ctx, u) => {
+					if (ctx.unit.uid !== u.uid) return;
+					QUEUE.add(async () => await BATTLE.drawCards(u.owner, 1));
+				}
+			},
+
+			// --- SUMMONING ---
+			'swarm': {
+				name: 'Nest', desc: 'End Turn: Summon a 1/1 Rat.', trigger: 'PHASE_END',
+				effect: async (ctx, u) => {
+					if (u.hp > 0 && BATTLE.getUnits(u.owner).length < 6) {
+						QUEUE.add(async () => {
+							const rat = new Entity('rat', u.owner);
+							await BATTLE.summonUnit(rat);
+						});
+					}
+				}
+			},
+			'guard_dog': {
+				name: 'K-9', desc: 'Deploy: Summon a 2/2 Dog with Taunt.', trigger: 'DEPLOY',
+				effect: async (ctx, u) => {
+					if (ctx.unit.uid !== u.uid) return;
+					QUEUE.add(async () => {
+						const dog = new Entity('dog', u.owner);
+						await BATTLE.summonUnit(dog);
+					});
+				}
+			},
+			'necromancer': {
+				name: 'Rise', desc: 'End Turn: Resurrect random ally.', trigger: 'PHASE_END',
+				effect: async (ctx, u) => {
+					if (u.hp > 0 && BATTLE.graveyard.length > 0 && BATTLE.getUnits(u.owner).length < 6) {
+						QUEUE.add(async () => {
+							const dead = BATTLE.graveyard.pop();
+							dead.hp = Math.floor(dead.maxHp / 2); // Resurrect with half HP
+							await BATTLE.summonUnit(dead);
+							UI.showFloatText(u.uid, "RISE!", "buff");
+						});
+					}
+				}
+			},
+
+			// --- SPECIAL ---
+			'assassin': {
+				name: 'Critical', desc: 'Deals 3x damage to Heroes.', trigger: null // Handled in logic
+			},
+			'watcher': {
+				name: 'Watch', desc: 'Gain +1/+1 when enemy deployed.', trigger: 'DEPLOY',
+				effect: async (ctx, u) => {
+					if (u.hp > 0 && ctx.unit.owner !== u.owner) {
+						QUEUE.add(async () => {
+							u.atk++; u.hp++; u.maxHp++;
+							UI.showFloatText(u.uid, "+1/+1", "buff");
+							UI.updateUnit(u);
+						});
+					}
+				}
+			},
+			'blood_pact': {
+				name: 'Sacrifice', desc: 'Deploy: Deal 2 DMG to your Hero to gain +3/+3.', trigger: 'DEPLOY',
+				effect: async (ctx, u) => {
+					if (ctx.unit.uid !== u.uid) return;
+					QUEUE.add(async () => {
+						await BATTLE.damageHero(u.owner, 2);
+						u.atk += 3; u.hp += 3; u.maxHp += 3;
+						UI.updateUnit(u);
+					});
+				}
+			},
+			// --- CROWD CONTROL (CC) ---
+			'silence': {
+				name: 'EMP', desc: 'Deploy: Silence a random enemy (Remove ability).', trigger: 'DEPLOY',
+				effect: async (ctx, u) => {
+					if (ctx.unit.uid !== u.uid) return;
+					const targets = BATTLE.getUnits(u.owner === 'player' ? 'enemy' : 'player');
+					if (targets.length > 0) {
+						const t = targets[Math.floor(Math.random() * targets.length)];
+						QUEUE.add(async () => {
+							t.abilityId = 'none'; // Remove ability
+							AUDIO.sfx.power_down(); // You might need to add this or use generic
+							UI.showFloatText(t.uid, "SILENCED", "dmg");
+							UI.updateUnit(t);
+						});
+					}
+				}
+			},
+			'blind': {
+				name: 'Flashbang', desc: 'Deploy: Give random enemy -3 ATK.', trigger: 'DEPLOY',
+				effect: async (ctx, u) => {
+					if (ctx.unit.uid !== u.uid) return;
+					const targets = BATTLE.getUnits(u.owner === 'player' ? 'enemy' : 'player');
+					if (targets.length > 0) {
+						const t = targets[Math.floor(Math.random() * targets.length)];
+						QUEUE.add(async () => {
+							t.atk = Math.max(0, t.atk - 3);
+							UI.showFloatText(t.uid, "-3 ATK", "dmg");
+							UI.updateUnit(t);
+						});
+					}
+				}
+			},
+			'shield': {
+				name: 'Shield', desc: 'Ally Dmg: Reduce incoming by 1', trigger: 'TAKE_DAMAGE',
+				effect: async (ctx, u) => {
+					if (ctx.target.owner == u.owner) {
+						ctx.amount -= 1
+					}
+				}
+			},
+			'cripple': {
+				name: 'Taser', desc: 'Deploy: Set a random enemy ATK to 0.', trigger: 'DEPLOY',
+				effect: async (ctx, u) => {
+					if (ctx.unit.uid !== u.uid) return;
+					const targets = BATTLE.getUnits(u.owner === 'player' ? 'enemy' : 'player');
+					if (targets.length > 0) {
+						const t = targets[Math.floor(Math.random() * targets.length)];
+						QUEUE.add(async () => {
+							t.atk = 0;
+							AUDIO.sfx.hit();
+							UI.showFloatText(t.uid, "0 ATK", "dmg");
+							UI.updateUnit(t);
+						});
+					}
+				}
+			},
+			'freeze_mana': {
+				name: 'Hack', desc: 'Deploy: Enemy loses 1 AP next turn.', trigger: 'DEPLOY',
+				effect: async (ctx, u) => {
+					// This is a bit tricky with current system, simplified to destroying current mana of enemy or dealing dmg equal to mana
+					if (ctx.unit.uid !== u.uid) return;
+					QUEUE.add(async () => {
+						// Visual only in this version unless we track enemy mana persistently, 
+						// but let's make it burn hero HP instead for "Short Circuit"
+						const dmg = 2;
+						await BATTLE.damageHero(u.owner === 'player' ? 'enemy' : 'player', dmg);
+						UI.showFloatText(u.uid, "ZAP!", "mana");
+					});
+				}
+			},
+			'confuse': {
+				name: 'Hysteria', desc: 'Deploy: Deal 1 DMG to ALL units (Friend & Foe).', trigger: 'DEPLOY',
+				effect: async (ctx, u) => {
+					if (ctx.unit.uid !== u.uid) return;
+					QUEUE.add(async () => {
+						AUDIO.sfx.explosion();
+						const all = [...BATTLE.getUnits('player'), ...BATTLE.getUnits('enemy')];
+						for (let unit of all) {
+							if (unit.uid !== u.uid) await BATTLE.damageUnit(unit, 1, u);
+						}
+					});
+				}
+			},
+
+			'heal': {
+				name: 'heal', desc: 'End Turn: Heal self 4 HP.', trigger: 'PHASE_END',
+				effect: async (ctx, u) => {
+					if (u.hp > 0) {
+						QUEUE.add(async () => {
+							if (u.hp < u.maxHp) {
+								u.hp = Math.min(u.maxHp, u.hp + 5);
+								UI.showFloatText(u.uid, "+5", "heal");
+								UI.updateUnit(u);
+							}
+						});
+					}
+				}
+			},
+
+			'execute_low': {
+				name: 'Cull', desc: 'Deploy: Destroy random enemy with 2 or less HP.', trigger: 'DEPLOY',
+				effect: async (ctx, u) => {
+					if (ctx.unit.uid !== u.uid) return;
+					const targets = BATTLE.getUnits(u.owner === 'player' ? 'enemy' : 'player').filter(e => e.hp <= 2);
+					if (targets.length > 0) {
+						const t = targets[Math.floor(Math.random() * targets.length)];
+						QUEUE.add(async () => {
+							await BATTLE.damageUnit(t, 99, u);
+							UI.showFloatText(u.uid, "EXECUTED", "dmg");
+						});
+					}
+				}
+			},
+			'cannibal': {
+				name: 'Eat', desc: 'Deploy: Destroy allied Rat to gain +2/+2.', trigger: 'DEPLOY',
+				effect: async (ctx, u) => {
+					if (ctx.unit.uid !== u.uid) return;
+					const rats = BATTLE.getUnits(u.owner).filter(a => a.id === 'rat' && a.uid !== u.uid);
+					if (rats.length > 0) {
+						const snack = rats[0];
+						QUEUE.add(async () => {
+							await BATTLE.damageUnit(snack, 99, u);
+							u.atk += 2; u.hp += 2; u.maxHp += 2;
+							UI.showFloatText(u.uid, "YUM", "buff");
+							UI.updateUnit(u);
+						});
+					}
+				}
+			},
+			'overload': {
+				name: 'Overload', desc: 'Deploy: Gain +3 ATK but take 2 DMG.', trigger: 'DEPLOY',
+				effect: async (ctx, u) => {
+					if (ctx.unit.uid !== u.uid) return;
+					QUEUE.add(async () => {
+						u.atk += 3;
+						await BATTLE.damageUnit(u, 2, u); // Self damage
+						UI.updateUnit(u);
+					});
+				}
+			},
+			'hand_buff': {
+				name: 'Supply', desc: 'Deploy: Give units in hand +1/+1.', trigger: 'DEPLOY',
+				effect: async (ctx, u) => {
+					if (ctx.unit.uid !== u.uid) return;
+					if (u.owner === 'player') {
+						QUEUE.add(async () => {
+							BATTLE.hand.forEach(c => {
+								c.atk = (c.atk || 0) + 1;
+								c.hp = (c.hp || 1) + 1;
+								c.maxHp = c.hp; // Simplification
+							});
+							UI.renderHand();
+							UI.showFloatText(u.uid, "SUPPLIED", "buff");
+						});
+					}
+				}
+			},
+			'payday': {
+				name: 'Payday', desc: 'End Turn: Gain 1 AP for next turn.', trigger: 'PHASE_END',
+				effect: async (ctx, u) => {
+					if (u.hp > 0) {
+						QUEUE.add(async () => {
+							// In this engine, Mana resets every turn, so we buff Max Mana contextually 
+							// or we trigger a one-off. For simplicity, we heal hero 1HP as "Money"
+							await BATTLE.healHero(u.owner, 1);
+						});
+					}
+				}
+			}
+		};
+
+		/** 
+		* CARD DATABASE (40+ UNITS)
+		*/
+		const CARDS_DB = {
+			// --- TIER 1 (Common/Cheap) ---
+			'rat': { id: 'rat', name: 'Sewer Rat', cost: 1, atk: 1, hp: 1, rarity: 'Common', sprite: '🐀', abilityId: 'none' },
+			'pigeon': { id: 'pigeon', name: 'Spy Drone', cost: 1, atk: 2, hp: 1, rarity: 'Common', sprite: '🛸', abilityId: 'none' },
+			'hobo': { id: 'hobo', name: 'Mad Prophet', cost: 1, atk: 1, hp: 3, rarity: 'Common', sprite: '🧟', abilityId: 'none' },
+			'dog': { id: 'dog', name: 'Stray Dog', cost: 2, atk: 2, hp: 2, rarity: 'Common', sprite: '🐕', abilityId: 'taunt' },
+			'punk': { id: 'punk', name: 'Street Punk', cost: 2, atk: 3, hp: 2, rarity: 'Common', sprite: '🛹', abilityId: 'none' },
+			'cop': { id: 'cop', name: 'Rookie Cop', cost: 2, atk: 2, hp: 2, rarity: 'Common', sprite: '👮', abilityId: 'shoot' },
+			'medic': { id: 'medic', name: 'Street Doc', cost: 2, atk: 1, hp: 3, rarity: 'Common', sprite: '⚕️', abilityId: 'medic' },
+			'trash': { id: 'trash', name: 'Trash Pile', cost: 2, atk: 0, hp: 6, rarity: 'Common', sprite: '🗑️', abilityId: 'taunt' },
+
+			// --- TIER 2 (Uncommon/Utility) ---
+			'thug': { id: 'thug', name: 'Enforcer', cost: 3, atk: 3, hp: 4, rarity: 'Rare', sprite: '😠', abilityId: 'none' },
+			'sniper': { id: 'sniper', name: 'Vigilante', cost: 3, atk: 2, hp: 2, rarity: 'Rare', sprite: '🧥', abilityId: 'snipe' },
+			'biker': { id: 'biker', name: 'Biker', cost: 3, atk: 4, hp: 3, rarity: 'Rare', sprite: '🏍️', abilityId: 'none' },
+			'drone': { id: 'drone', name: 'Attack Bot', cost: 3, atk: 3, hp: 1, rarity: 'Rare', sprite: '🤖', abilityId: 'thorns' },
+			'hacker': { id: 'hacker', name: 'Netrunner', cost: 3, atk: 1, hp: 3, rarity: 'Rare', sprite: '💻', abilityId: 'generator' },
+			'mutant': { id: 'mutant', name: 'Sludge', cost: 3, atk: 2, hp: 5, rarity: 'Rare', sprite: '🦠', abilityId: 'regen' },
+			'shield': { id: 'shield', name: 'Riot Police', cost: 3, atk: 1, hp: 6, rarity: 'Rare', sprite: '🛡️', abilityId: 'taunt' },
+			'scout': { id: 'scout', name: 'Fixer', cost: 3, atk: 2, hp: 3, rarity: 'Rare', sprite: '🕵️', abilityId: 'investor' },
+
+			// --- TIER 3 (Strong/Specialized) ---
+			'ninja': { id: 'ninja', name: 'Cyber Ninja', cost: 4, atk: 5, hp: 3, rarity: 'Epic', sprite: '🥷', abilityId: 'assassin' },
+			'brute': { id: 'brute', name: 'Gym Bro', cost: 4, atk: 2, hp: 6, rarity: 'Epic', sprite: '🏋️', abilityId: 'berserk' },
+			'cultist': { id: 'cultist', name: 'Cultist', cost: 4, atk: 3, hp: 3, rarity: 'Epic', sprite: '🔮', abilityId: 'revenge' },
+			'vamp': { id: 'vamp', name: 'Night Lord', cost: 4, atk: 3, hp: 4, rarity: 'Epic', sprite: '🧛', abilityId: 'lifesteal' },
+			'bomber': { id: 'bomber', name: 'Anarchist', cost: 4, atk: 2, hp: 2, rarity: 'Epic', sprite: '💣', abilityId: 'last_laugh' },
+			'handler': { id: 'handler', name: 'K-9 Unit', cost: 4, atk: 2, hp: 4, rarity: 'Epic', sprite: '👮‍♂️', abilityId: 'guard_dog' },
+			'gargoyle': { id: 'gargoyle', name: 'Watcher', cost: 4, atk: 2, hp: 5, rarity: 'Epic', sprite: '🦇', abilityId: 'watcher' },
+			'blood': { id: 'blood', name: 'Blood Mage', cost: 4, atk: 1, hp: 4, rarity: 'Epic', sprite: '🩸', abilityId: 'blood_pact' },
+
+			// --- TIER 4 (Legendary/Finishers) ---
+			'boss': { id: 'boss', name: 'The Don', cost: 5, atk: 5, hp: 6, rarity: 'Legend', sprite: '🤵', abilityId: 'rally' },
+			'mech': { id: 'mech', name: 'War Mech', cost: 6, atk: 6, hp: 8, rarity: 'Legend', sprite: '🦾', abilityId: 'taunt' },
+			'tank': { id: 'tank', name: 'Bulldozer', cost: 6, atk: 8, hp: 6, rarity: 'Legend', sprite: '🚜', abilityId: 'none' },
+			'demon': { id: 'demon', name: 'Cyber Demon', cost: 7, atk: 6, hp: 6, rarity: 'Legend', sprite: '👹', abilityId: 'grow' },
+			'mother': { id: 'mother', name: 'Brood Mom', cost: 6, atk: 2, hp: 10, rarity: 'Legend', sprite: '🕷️', abilityId: 'swarm' },
+			'reaper': { id: 'reaper', name: 'Reaper', cost: 7, atk: 9, hp: 1, rarity: 'Legend', sprite: '💀', abilityId: 'execute' },
+			'priest': { id: 'priest', name: 'High Priest', cost: 6, atk: 2, hp: 8, rarity: 'Legend', sprite: '🕎', abilityId: 'necromancer' },
+			'hero': { id: 'hero', name: 'Captain', cost: 5, atk: 4, hp: 6, rarity: 'Legend', sprite: '🦸', abilityId: 'shield' }, // Shield = thorns + taunt logic handled via ID? No, abilityId is single.
+
+			// --- SPECIAL BOSS UNITS (Not in player pool usually) ---
+			'b_mayor': { id: 'b_mayor', name: 'The Mayor', cost: 9, atk: 5, hp: 20, rarity: 'Legend', sprite: '🤴', abilityId: 'investor' },
+			'b_beast': { id: 'b_beast', name: 'Sewer King', cost: 9, atk: 8, hp: 15, rarity: 'Legend', sprite: '🦖', abilityId: 'regen' },
+
+			// --- CC SPECIALISTS (5) ---
+			'hacker_elite': { id: 'hacker_elite', name: 'Blackhat', cost: 3, atk: 1, hp: 3, rarity: 'Rare', sprite: '👨‍💻', abilityId: 'silence' },
+			'swat_gren': { id: 'swat_gren', name: 'SWAT', cost: 3, atk: 2, hp: 3, rarity: 'Rare', sprite: '🌫️', abilityId: 'blind' },
+			'prod_cop': { id: 'prod_cop', name: 'Enforcer', cost: 4, atk: 3, hp: 5, rarity: 'Epic', sprite: '⚡', abilityId: 'cripple' },
+			'screamer': { id: 'screamer', name: 'Screamer', cost: 4, atk: 4, hp: 4, rarity: 'Rare', sprite: '😱', abilityId: 'confuse' },
+			'net_ghost': { id: 'net_ghost', name: 'Net Ghost', cost: 5, atk: 4, hp: 4, rarity: 'Legend', sprite: '👻', abilityId: 'freeze_mana' },
+
+			// --- LOW COST FODDER (10) ---
+			'junkyard_dog': { id: 'junkyard_dog', name: 'Mutt', cost: 1, atk: 2, hp: 1, rarity: 'Common', sprite: '🐕', abilityId: 'none' },
+			'graffiti': { id: 'graffiti', name: 'Artist', cost: 1, atk: 1, hp: 2, rarity: 'Common', sprite: '🎨', abilityId: 'investor' },
+			'pickpocket': { id: 'pickpocket', name: 'Thief', cost: 1, atk: 1, hp: 1, rarity: 'Common', sprite: '🖐️', abilityId: 'generator' },
+			'brick': { id: 'brick', name: 'Brick', cost: 1, atk: 0, hp: 4, rarity: 'Common', sprite: '🧱', abilityId: 'taunt' },
+			'molotov': { id: 'molotov', name: 'Rioter', cost: 1, atk: 3, hp: 1, rarity: 'Common', sprite: '🍾', abilityId: 'none' },
+			'tiny_bot': { id: 'tiny_bot', name: 'Micro Bot', cost: 1, atk: 1, hp: 1, rarity: 'Common', sprite: '📠', abilityId: 'thorns' },
+			'intern': { id: 'intern', name: 'Intern', cost: 1, atk: 1, hp: 2, rarity: 'Common', sprite: '📎', abilityId: 'medic' },
+			'flyer': { id: 'flyer', name: 'Advert', cost: 0, atk: 0, hp: 1, rarity: 'Common', sprite: '📄', abilityId: 'taunt' },
+			'scav': { id: 'scav', name: 'Scav', cost: 2, atk: 2, hp: 2, rarity: 'Common', sprite: '🎒', abilityId: 'none' },
+			'barbwire': { id: 'barbwire', name: 'Wire', cost: 2, atk: 0, hp: 5, rarity: 'Common', sprite: '➰', abilityId: 'thorns' },
+
+			// --- MID RANGE & UTILITY (15) ---
+			'butcher': { id: 'butcher', name: 'Butcher', cost: 3, atk: 4, hp: 2, rarity: 'Uncommon', sprite: '🔪', abilityId: 'lifesteal' },
+			'pyro': { id: 'pyro', name: 'Pyro', cost: 3, atk: 3, hp: 3, rarity: 'Uncommon', sprite: '🔥', abilityId: 'shoot' },
+			'mechanic_mk2': { id: 'mechanic_mk2', name: 'Engineer', cost: 3, atk: 1, hp: 4, rarity: 'Uncommon', sprite: '🔧', abilityId: 'hand_buff' },
+			'bodyguard': { id: 'bodyguard', name: 'Bouncer', cost: 3, atk: 2, hp: 6, rarity: 'Rare', sprite: '🕴️', abilityId: 'taunt' },
+			'mutant_rat': { id: 'mutant_rat', name: 'Rat King', cost: 3, atk: 2, hp: 4, rarity: 'Rare', sprite: '🐁', abilityId: 'swarm' },
+			'cyborg': { id: 'cyborg', name: 'T-800', cost: 4, atk: 4, hp: 4, rarity: 'Rare', sprite: '🦾', abilityId: 'none' },
+			'sniper_turret': { id: 'sniper_turret', name: 'Turret', cost: 4, atk: 2, hp: 6, rarity: 'Rare', sprite: '🔭', abilityId: 'snipe' },
+			'chem_tank': { id: 'chem_tank', name: 'Hazmat', cost: 4, atk: 1, hp: 6, rarity: 'Rare', sprite: '☣️', abilityId: 'thorns' },
+			'gladiator': { id: 'gladiator', name: 'Champ', cost: 4, atk: 3, hp: 5, rarity: 'Epic', sprite: '🏆', abilityId: 'berserk' },
+			'assassin_mk2': { id: 'assassin_mk2', name: 'Shadow', cost: 4, atk: 6, hp: 2, rarity: 'Epic', sprite: '🗡️', abilityId: 'assassin' },
+			'stim_freak': { id: 'stim_freak', name: 'Juicer', cost: 3, atk: 1, hp: 4, rarity: 'Uncommon', sprite: '💉', abilityId: 'overload' },
+			'banker': { id: 'banker', name: 'Banker', cost: 3, atk: 1, hp: 3, rarity: 'Rare', sprite: '💼', abilityId: 'payday' },
+			'cannibal': { id: 'cannibal', name: 'Goul', cost: 3, atk: 3, hp: 3, rarity: 'Rare', sprite: '🦴', abilityId: 'cannibal' },
+			'cleaner': { id: 'cleaner', name: 'Cleaner', cost: 5, atk: 3, hp: 4, rarity: 'Epic', sprite: '🧤', abilityId: 'execute_low' },
+			'promoter': { id: 'promoter', name: 'Hype Man', cost: 3, atk: 1, hp: 3, rarity: 'Uncommon', sprite: '📣', abilityId: 'rally' },
+
+			// --- HEAVY HITTERS (10) ---
+			'goliath': { id: 'goliath', name: 'Goliath', cost: 5, atk: 6, hp: 7, rarity: 'Rare', sprite: '🗿', abilityId: 'none' },
+			'war_drone': { id: 'war_drone', name: 'Predator', cost: 5, atk: 5, hp: 5, rarity: 'Epic', sprite: '🚁', abilityId: 'shoot' },
+			'slime_hulk': { id: 'slime_hulk', name: 'Blob', cost: 5, atk: 3, hp: 8, rarity: 'Epic', sprite: '🦠', abilityId: 'regen' },
+			'exo_suit': { id: 'exo_suit', name: 'Exo Suit', cost: 6, atk: 5, hp: 7, rarity: 'Legend', sprite: '🚉', abilityId: 'shield' },
+			'behemoth': { id: 'behemoth', name: 'Behemoth', cost: 7, atk: 8, hp: 8, rarity: 'Legend', sprite: '🐗', abilityId: 'taunt' },
+			'laser_cannon': { id: 'laser_cannon', name: 'Ion Canon', cost: 7, atk: 10, hp: 4, rarity: 'Legend', sprite: '🔆', abilityId: 'none' },
+			'dozer': { id: 'dozer', name: 'Killdozer', cost: 6, atk: 4, hp: 9, rarity: 'Epic', sprite: '🚜', abilityId: 'last_laugh' },
+			'samurai': { id: 'samurai', name: 'Ronin', cost: 5, atk: 6, hp: 4, rarity: 'Epic', sprite: '🏯', abilityId: 'execute' },
+			'hive_mind': { id: 'hive_mind', name: 'Hive', cost: 6, atk: 2, hp: 8, rarity: 'Legend', sprite: '🧠', abilityId: 'hand_buff' },
+			'alpha': { id: 'alpha', name: 'Alpha', cost: 6, atk: 5, hp: 6, rarity: 'Legend', sprite: '🐺', abilityId: 'rally' },
+
+			// --- SPECIAL / WEIRD (10) ---
+			'mimic': { id: 'mimic', name: 'Chest', cost: 2, atk: 0, hp: 4, rarity: 'Rare', sprite: '📦', abilityId: 'revenge' },
+			'totem': { id: 'totem', name: 'Totem', cost: 2, atk: 0, hp: 5, rarity: 'Rare', sprite: '🗿', abilityId: 'grow' },
+			'portal': { id: 'portal', name: 'Rift', cost: 4, atk: 0, hp: 6, rarity: 'Epic', sprite: '🌀', abilityId: 'swarm' },
+			'martyr': { id: 'martyr', name: 'Saint', cost: 3, atk: 0, hp: 3, rarity: 'Rare', sprite: '🛐', abilityId: 'last_laugh' },
+			'gambler': { id: 'gambler', name: 'Dice', cost: 2, atk: 3, hp: 3, rarity: 'Uncommon', sprite: '🎲', abilityId: 'investor' },
+			'voodoo': { id: 'voodoo', name: 'Doll', cost: 2, atk: 1, hp: 1, rarity: 'Rare', sprite: '🪆', abilityId: 'thorns' },
+			'monk': { id: 'monk', name: 'Monk', cost: 3, atk: 2, hp: 5, rarity: 'Rare', sprite: '📿', abilityId: 'heal' }, // Requires 'heal' ability or reuse 'medic'
+			'mirror': { id: 'mirror', name: 'Reflect', cost: 3, atk: 0, hp: 5, rarity: 'Epic', sprite: '🪞', abilityId: 'thorns' },
+			'battery': { id: 'battery', name: 'Cell', cost: 0, atk: 0, hp: 1, rarity: 'Common', sprite: '🔋', abilityId: 'generator' },
+			'nuke': { id: 'nuke', name: 'The End', cost: 10, atk: 0, hp: 1, rarity: 'Legend', sprite: '☢️', abilityId: 'last_laugh' }
+
+		};
+
+		const CONFIG = {
+			startHP: 10, // Increased Player HP
+			baseMana: 3,
+			startManaCap: 3,
+			maxManaCap: 10
+		};
+
+		const ENEMIES_DB = [
+			// Level 1-3
+			{ name: "Looters", hp: 5, deck: ['rat', 'rat', 'hobo'], sprite: '🥡' },
+			{ name: "Punks", hp: 5, deck: ['punk', 'punk', 'dog', 'trash'], sprite: '🚬' },
+			{ name: "Corrupt PD", hp: 6, deck: ['cop', 'cop', 'shield', 'drone'], sprite: '🚓' },
+			{ name: "Vermintide", hp: 5, deck: ['rat', 'rat', 'rat', 'mutant_rat', 'junkyard_dog'], sprite: '🐀' },
+			{ name: "Blockade", hp: 5, deck: ['brick', 'brick', 'trash', 'sniper', 'molotov'], sprite: '🚧' },
+			{ name: "Junkies", hp: 4, deck: ['stim_freak', 'hobo', 'stim_freak', 'intern', 'flyer'], sprite: '💉' },
+
+			// Level 4-6
+			{ name: "Biker Gang", hp: 8, deck: ['biker', 'biker', 'thug', 'sniper'], sprite: '🏍️' },
+			{ name: "Yakuza", hp: 9, deck: ['ninja', 'thug', 'hacker', 'boss'], sprite: '👹' },
+			{ name: "Cultists", hp: 8, deck: ['cultist', 'mutant', 'blood', 'demon'], sprite: '🕯️' },
+			{ name: "Cyber-Sec", hp: 6, deck: ['hacker_elite', 'swat_gren', 'prod_cop', 'drone', 'shield'], sprite: '👮' },
+			{ name: "Blood Cult", hp: 8, deck: ['butcher', 'cultist', 'blood', 'medic', 'vamp'], sprite: '🩸' },
+			{ name: "Fight Club", hp: 7, deck: ['gladiator', 'brawler', 'barbwire', 'voodoo', 'mimic'], sprite: '🥊' },
+			{ name: "The Union", hp: 8, deck: ['mechanic_mk2', 'mechanic_mk2', 'cyborg', 'promoter', 'dozer'], sprite: '👷' },
+
+			// Level 7+
+			{ name: "Corp Sec", hp: 10, deck: ['mech', 'sniper', 'shield', 'tank'], sprite: '🏢' },
+			{ name: "Bio-Hazard", hp: 10, deck: ['mutant', 'mother', 'rat', 'mutant'], sprite: '☢️' },
+			{ name: "Shadow Clan", hp: 10, deck: ['ninja', 'assassin_mk2', 'swat_gren', 'smoke_bomb', 'samurai'], sprite: '🥷' },
+			{ name: "Heavy Metal", hp: 9, deck: ['tank', 'exo_suit', 'laser_cannon', 'war_drone', 'battery'], sprite: '🦾' },
+			{ name: "Anarchists", hp: 9, deck: ['screamer', 'bomber', 'nuke', 'molotov', 'martyr'], sprite: '💣' },
+
+			// BOSSES
+			{ name: "SEWER KING", hp: 15, deck: ['b_beast', 'mother', 'rat', 'rat', 'mutant'], sprite: '🐊' },
+			{ name: "THE MAYOR", hp: 15, deck: ['b_mayor', 'mech', 'shield', 'sniper', 'cop'], sprite: '🏛️' },
+			{ name: "BROOD MOTHER", hp: 14, deck: ['mother', 'portal', 'mutant_rat', 'alpha', 'hive_mind', 'rat'], sprite: '🕷️' },
+			{ name: "DIRECTOR", hp: 13, deck: ['net_ghost', 'hacker_elite', 'banker', 'bodyguard', 'sniper_turret', 'laser_cannon'], sprite: '🕴️' },
+			{ name: "IMMORTAL", hp: 14, deck: ['priest', 'slime_hulk', 'martyr', 'totem', 'goliath', 'necromancer'], sprite: '🧟' }
+
+		];
+		const BOSS_NAMES = ["SEWER KING", "THE MAYOR", "BROOD MOTHER", "DIRECTOR", "IMMORTAL"];
+		/**
+		* AUDIO ENGINE
+		*/
+		const AUDIO = {
+			ctx: null,
+			init: function () {
+				if (this.ctx) return;
+				const AudioContext = window.AudioContext || window.webkitAudioContext;
+				this.ctx = new AudioContext();
+			},
+			playTone: function (freq, type, duration, vol = 0.1, slide = 0) {
+				if (!this.ctx) return;
+				const osc = this.ctx.createOscillator();
+				const gain = this.ctx.createGain();
+				osc.type = type;
+				osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+				if (slide !== 0) {
+					osc.frequency.linearRampToValueAtTime(freq + slide, this.ctx.currentTime + duration);
+				}
+				gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+				gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+				osc.connect(gain);
+				gain.connect(this.ctx.destination);
+				osc.start();
+				osc.stop(this.ctx.currentTime + duration);
+			},
+			sfx: {
+				click: () => AUDIO.playTone(600, 'sine', 0.05, 0.05),
+				draw: () => AUDIO.playTone(400, 'triangle', 0.05, 0.03),
+				shuffle: () => {
+					AUDIO.playTone(300, 'sawtooth', 0.1, 0.05, 100);
+					setTimeout(() => AUDIO.playTone(300, 'sawtooth', 0.1, 0.05, 100), 100);
+				},
+				summon: () => AUDIO.playTone(150, 'square', 0.1, 0.05, -50),
+				gunshot: () => {
+					AUDIO.playTone(100, 'sawtooth', 0.1, 0.1, -100);
+					setTimeout(() => AUDIO.playTone(50, 'square', 0.1, 0.05), 50);
+				},
+				hit: () => AUDIO.playTone(80, 'sawtooth', 0.1, 0.1),
+				heal: () => {
+					AUDIO.playTone(400, 'sine', 0.1, 0.05);
+					setTimeout(() => AUDIO.playTone(600, 'sine', 0.3, 0.05), 100);
+				},
+				coin: () => AUDIO.playTone(1200, 'sine', 0.3, 0.05),
+				shout: () => AUDIO.playTone(300, 'square', 0.3, 0.05, 100),
+				buff: () => AUDIO.playTone(500, 'sine', 0.3, 0.05, 100),
+				explosion: () => {
+					AUDIO.playTone(100, 'sawtooth', 0.5, 0.2, -50);
+					setTimeout(() => AUDIO.playTone(50, 'square', 0.5, 0.2), 100);
+				},
+				win: () => {
+					AUDIO.playTone(300, 'sine', 0.1, 0.1);
+					setTimeout(() => AUDIO.playTone(400, 'sine', 0.1, 0.1), 150);
+					setTimeout(() => AUDIO.playTone(500, 'sine', 0.2, 0.1), 300);
+				}
+			}
+		};
+
+		/**
+		* UTILS & QUEUE
+		*/
+		const uuid = () => Math.random().toString(36).substr(2, 9);
+		const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+		const rnd = (arr) => arr[Math.floor(Math.random() * arr.length)];
+		const rndInt = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
+
+		class ResolverQueue {
+			constructor() { this.queue = []; this.processing = false; }
+			add(task) { this.queue.push(task); this.process(); }
+			async process() {
+				if (this.processing) return;
+				this.processing = true;
+				while (this.queue.length > 0) {
+					try { await this.queue.shift()(); }
+					catch (e) { console.error(e); }
+				}
+				this.processing = false;
+			}
+		}
+		const QUEUE = new ResolverQueue();
+
+		/**
+		* EVENTS & LOGIC
+		*/
+		class EventBus {
+			constructor() { this.listeners = {}; }
+			clear() { this.listeners = {}; }
+			async emit(event, context) {
+				await System_Abilities.handleEvent(event, context);
+			}
+		}
+		const EVENTS = new EventBus();
+
+		const System_Abilities = {
+			handleEvent: async function (eventName, context) {
+				const units = BATTLE.units;
+				for (let unit of units) {
+					const ability = ABILITIES[unit.abilityId];
+					if (ability && ability.trigger === eventName) {
+						await ability.effect(context, unit);
+					}
+				}
+			}
+		};
+
+		class Entity {
+			constructor(templateId, owner) {
+				const tpl = CARDS_DB[templateId];
+				this.uid = uuid();
+				this.id = templateId;
+				this.owner = owner;
+				this.name = tpl.name;
+				this.cost = tpl.cost;
+				this.atk = tpl.atk;
+				this.maxHp = tpl.hp;
+				this.hp = tpl.hp;
+				this.sprite = tpl.sprite;
+				this.abilityId = tpl.abilityId;
+				this.zone = 'deck';
+				this.dead = false;
+				this.rarity = tpl.rarity;
+			}
+		}
+
+		const GAME = {
+			deck: [],
+			hp: CONFIG.startHP,
+			level: 1,
+			pendingRewards: [],
+
+			init: function () {
+				AUDIO.init();
+				// Starter Deck
+				this.deck = ['rat', 'rat', 'medic', 'cop', 'trash', 'pigeon'];
+				this.hp = CONFIG.startHP;
+				this.level = 1;
+				this.generateLevel();
+			},
+
+			generateLevel: function () {
+				const nodes = [];
+				const numNodes = rndInt(2, 3);
+				const types = ['Subway', 'Park', 'Downtown', 'Warehouse', 'Slums'];
+
+				document.getElementById('map-title').innerText = `Sector ${this.level}`;
+
+				for (let i = 0; i < numNodes; i++) {
+					let type = rnd(types);
+					if (this.level % 5 === 0) type = 'BOSS';
+					nodes.push({ type: type, id: uuid() });
+				}
+
+				UI.showMap(nodes);
+			},
+
+			getEnemyPool: function () {
+				// 1. Separate Bosses from Regular Mobs
+				const mobs = ENEMIES_DB.filter(e => !BOSS_NAMES.includes(e.name));
+
+				// 2. Calculate Chunk Size (Total Mobs / 3)
+				const total = mobs.length;
+				const chunkSize = Math.ceil(total / 3);
+
+				// 3. Define Tiers by slicing the array
+				const tier1 = mobs.slice(0, chunkSize);
+				const tier2 = mobs.slice(chunkSize, chunkSize * 2);
+				const tier3 = mobs.slice(chunkSize * 2, total);
+
+				// 4. Return specific pool based on Level
+				if (this.level <= 3) return tier1;
+				if (this.level <= 6) return tier2;
+				return tier3;
+			},
+
+			handleNodeSelect: function (node) {
+				AUDIO.sfx.click();
+
+				if (node.type === 'Warehouse') {
+					this.enterWarehouse();
+				}
+				else {
+					let enemyTemplate;
+
+					// --- BOSS BATTLE LOGIC ---
+					if (node.type === 'BOSS') {
+						// Filter specifically for Bosses
+						const bosses = ENEMIES_DB.filter(e => BOSS_NAMES.includes(e.name));
+
+						// Pick a boss based on progression (Cycle through them or pick strongest)
+						// Logic: Level 5 = Boss 1, Level 10 = Boss 2, etc.
+						const bossIndex = Math.floor(this.level / 5) - 1;
+
+						// If we run out of bosses, just fight the last one (Immortal)
+						enemyTemplate = bosses[bossIndex] || bosses[bosses.length - 1];
+					}
+					// --- REGULAR BATTLE LOGIC ---
+					else {
+						// Get the automatically generated pool for this level
+						const pool = this.getEnemyPool();
+
+						// Pick a random enemy from that pool
+						// If pool is empty (error safety), pick the very first enemy in DB
+						enemyTemplate = rnd(pool) || ENEMIES_DB[0];
+					}
+
+					BATTLE.start(enemyTemplate, this.level);
+				}
+			},
+
+			generatePendingRewards: function () {
+				const keys = Object.keys(CARDS_DB).filter(k => !k.startsWith('b_')); // No boss cards
+				this.pendingRewards = [];
+				for (let i = 0; i < 3; i++) {
+					// Weighted Random for Rarity
+					let r = Math.random();
+					let rarity = 'Common';
+					if (r > 0.4) rarity = 'Rare';
+					if (r > 0.65) rarity = 'Epic';
+					if (r > 0.75) rarity = 'Legend';
+
+					const pool = keys.filter(k => CARDS_DB[k].rarity === rarity);
+					const choice = rnd(pool) || rnd(keys);
+					this.pendingRewards.push(choice);
+				}
+			},
+
+			showVictoryChoices: function () {
+				this.generatePendingRewards();
+				UI.showScreen('screen-choice');
+			},
+
+			prepBattleReward: function () {
+				document.getElementById('reward-title').innerText = "Recruit Unit";
+				document.getElementById('screen-reward').classList.remove('warehouse-theme');
+				document.getElementById('btn-reward-back').style.display = 'block';
+				document.getElementById('btn-reward-skip').style.display = 'none';
+
+				UI.renderRewardList(this.pendingRewards, true, (cardId) => {
+					this.deck.push(cardId);
+					this.nextLevel();
+				});
+				UI.showScreen('screen-reward');
+			},
+
+			prepFireReward: function () {
+				document.getElementById('reward-title').innerText = "Fire Unit";
+				document.getElementById('screen-reward').classList.remove('warehouse-theme');
+				document.getElementById('btn-reward-back').style.display = 'block';
+				document.getElementById('btn-reward-skip').style.display = 'none';
+
+				UI.renderRewardList(this.deck, false, (cardId, index) => {
+					this.deck.splice(index, 1);
+					this.nextLevel();
+				});
+				UI.showScreen('screen-reward');
+			},
+
+			enterWarehouse: function () {
+				this.generatePendingRewards();
+				document.getElementById('reward-title').innerText = "Supply Crate";
+				document.getElementById('screen-reward').classList.add('warehouse-theme');
+				document.getElementById('btn-reward-back').style.display = 'none';
+				document.getElementById('btn-reward-skip').style.display = 'block';
+
+				UI.renderRewardList(this.pendingRewards, true, (cardId) => {
+					this.deck.push(cardId);
+					this.nextLevel();
+				});
+				UI.showScreen('screen-reward');
+			},
+
+			nextLevel: function () {
+				this.level++;
+				this.generateLevel();
+			}
+		};
+
+		const BATTLE = {
+			turn: 0,
+			currentMana: 0,
+			maxMana: 3,
+			enemy: null,
+			units: [],
+
+			deck: [],
+			hand: [],
+			graveyard: [],
+			enemyDeck: [],
+
+			start: function (enemyTemplate, level) {
+				EVENTS.clear();
+				document.getElementById('btn-end-setup').disabled = false;
+
+				this.turn = 0;
+				this.units = [];
+				this.hand = [];
+				this.graveyard = [];
+
+				this.deck = GAME.deck.map(id => new Entity(id, 'player'));
+				this.deck.sort(() => Math.random() - 0.5);
+
+				const multiplier = 1 + (level * 0.15);
+
+				this.enemy = {
+					...enemyTemplate,
+					maxHp: Math.floor(enemyTemplate.hp * multiplier),
+					currentHp: Math.floor(enemyTemplate.hp * multiplier),
+					name: `${enemyTemplate.name}`
+				};
+
+				this.enemyDeck = enemyTemplate.deck.map(id => {
+					const e = new Entity(id, 'enemy');
+					// Slight scaling for enemy units (Let's not make it too crazy)
+					// if (level > 3) { e.hp += 1; e.maxHp += 1; }
+					// if (level > 6) { e.atk += 1; }
+					return e;
+				});
+
+				UI.showBattle();
+				this.startSetupPhase();
+			},
+
+			startSetupPhase: function () {
+				this.turn++;
+				// Calculate Base Mana
+				let manaCtx = { amount: CONFIG.baseMana + (this.turn - 1), owner: 'player' };
+
+				QUEUE.add(async () => {
+					// EVENT: CALC_MANA (Allows abilities to modify the amount)
+					await EVENTS.emit('CALC_MANA', manaCtx);
+
+					this.maxMana = Math.min(CONFIG.maxManaCap, manaCtx.amount);
+					this.currentMana = this.maxMana;
+
+					UI.updateHUD();
+					UI.renderHand();
+
+					// Trigger start of turn
+					await EVENTS.emit('PHASE_START', { turn: this.turn });
+
+					await this.drawCards('player', 2);
+					await this.enemyAI();
+				});
+			},
+
+			enemyAI: async function () {
+				const maxUnits = 2 + Math.floor(this.turn / 2);
+				const currentEnemyUnits = this.units.filter(u => u.owner === 'enemy').length;
+
+				// Enemy draws and plays until full or empty
+				let attempts = 0;
+				while (currentEnemyUnits < maxUnits && this.enemyDeck.length > 0 && attempts < 2) {
+					attempts++;
+					const card = this.enemyDeck.shift();
+					await this.summonUnit(card);
+					await sleep(200);
+				}
+			},
+
+			drawCards: async function (owner, amount) {
+				if (owner === 'enemy') return;
+
+				for (let i = 0; i < amount; i++) {
+					if (this.deck.length === 0 && this.graveyard.length > 0) {
+						AUDIO.sfx.shuffle();
+						UI.showFloatText('deck-counter', "RELOAD", "buff");
+						await sleep(500);
+						this.deck = [...this.graveyard];
+						this.graveyard = [];
+						this.deck.sort(() => Math.random() - 0.5);
+						UI.updateHUD();
+					}
+
+					if (this.deck.length > 0) {
+						// Max hand size check
+						if (this.hand.length >= 7) {
+							const burned = this.deck.shift();
+							UI.showFloatText('player-hand', "HAND FULL!", "dmg");
+							this.graveyard.push(burned);
+						} else {
+							const card = this.deck.shift();
+							card.zone = 'hand';
+							this.hand.push(card);
+							AUDIO.sfx.draw();
+							UI.renderHand();
+							UI.updateHUD();
+							await sleep(150);
+						}
+					}
+				}
+			},
+
+			playCard: function (cardUid) {
+				const cardIndex = this.hand.findIndex(c => c.uid === cardUid);
+				if (cardIndex === -1) return;
+				const card = this.hand[cardIndex];
+
+				if (this.currentMana >= card.cost) {
+					this.currentMana -= card.cost;
+					this.hand.splice(cardIndex, 1);
+
+					UI.updateHUD();
+					UI.renderHand();
+
+					QUEUE.add(async () => {
+						await this.summonUnit(card);
+					});
+				}
+			},
+
+			summonUnit: async function (unit) {
+				unit.zone = 'board';
+				unit.dead = false;
+				this.units.push(unit);
+				AUDIO.sfx.summon();
+				UI.renderBoard();
+				await EVENTS.emit('DEPLOY', { unit });
+			},
+
+			endSetup: function () {
+				const btn = document.getElementById('btn-end-setup');
+				btn.disabled = true;
+
+				QUEUE.add(async () => {
+					await this.resolveAttackPhase();
+
+					if (GAME.hp <= 0) {
+						alert("GAME OVER.");
+						window.location.reload();
+						return;
+					}
+					if (this.enemy.currentHp <= 0) {
+						AUDIO.sfx.win();
+						GAME.showVictoryChoices();
+						return;
+					}
+
+					await EVENTS.emit('PHASE_END', {});
+
+					// Cleanup Dead
+					const alive = [];
+					for (let u of this.units) {
+						if (u.hp <= 0 || u.dead) {
+							if (u.owner === 'player') {
+								u.hp = u.maxHp;
+								u.zone = 'graveyard';
+								this.graveyard.push(u);
+							}
+							// Enemy units just vanish
+						} else {
+							alive.push(u);
+						}
+					}
+					this.units = alive;
+
+					UI.renderBoard();
+					UI.updateHUD();
+
+					btn.disabled = false;
+					this.startSetupPhase();
+				});
+			},
+
+			resolveAttackPhase: async function () {
+				const playerUnits = this.units.filter(u => u.owner === 'player' && !u.dead);
+				const enemyUnits = this.units.filter(u => u.owner === 'enemy' && !u.dead);
+				const attackers = [...playerUnits, ...enemyUnits];
+
+				// Speed sort? Currently standard order
+
+				for (let unit of attackers) {
+					if (unit.hp <= 0 || unit.dead) continue;
+
+					await sleep(300);
+
+					const opposingOwner = unit.owner === 'player' ? 'enemy' : 'player';
+					let targets = this.units.filter(u => u.owner === opposingOwner && u.hp > 0 && !u.dead);
+
+					// --- TAUNT CHECK ---
+					const taunters = targets.filter(u => ABILITIES[u.abilityId].isTaunt);
+					if (taunters.length > 0) targets = taunters;
+					// -------------------
+
+					UI.animateAttack(unit.uid);
+					AUDIO.sfx.hit();
+					await sleep(100);
+
+					// Select Target
+					let target = null;
+					if (targets.length > 0) {
+						target = targets[0]; // Simplistic targeting (frontline)
+					}
+
+					// TRIGGER: ATTACK (Before damage) - Allows Lifesteal etc
+					await EVENTS.emit('ATTACK', { source: unit, target: target });
+
+					if (target) {
+						let finalDmg = unit.atk;
+
+						// ABILITY: Execute logic
+						if (unit.abilityId === 'execute' && target.hp < (target.maxHp * 0.5)) {
+							finalDmg *= 2;
+							UI.showFloatText(unit.uid, "EXECUTE!", "dmg");
+						}
+
+						// ABILITY: Assassin Logic
+						if (unit.abilityId === 'assassin') {
+							// Assassin does normal dmg to units, logic handles hero boost below
+						}
+
+						await this.damageUnit(target, finalDmg, unit);
+					} else {
+						let heroDmg = unit.atk;
+						if (unit.abilityId === 'assassin') {
+							heroDmg *= 3;
+							UI.showFloatText(unit.uid, "CRIT!", "dmg");
+						}
+						await this.damageHero(opposingOwner, heroDmg);
+					}
+				}
+			},
+
+			damageUnit: async function (unit, amount, source) {
+				if (unit.dead || amount <= 0) return;
+
+				var evntContext = { target: unit, source: source, amount: amount }
+				await EVENTS.emit('TAKE_DAMAGE', evntContext);
+				if (evntContext.amount < 0) { evntContext.amount = 0 }
+
+				unit.hp -= evntContext.amount;
+				UI.showFloatText(unit.uid, `-${evntContext.amount}`, "dmg");
+				UI.updateUnit(unit);
+
+				if (unit.hp <= 0 && !unit.dead) {
+					unit.dead = true;
+					await EVENTS.emit('DEATH', { unit: unit });
+					const el = document.getElementById(`unit-${unit.uid}`);
+					if (el) el.style.opacity = '0.3';
+				}
+
+				await sleep(100);
+			},
+
+			damageHero: async function (who, amount) {
+				if (amount <= 0) return;
+				if (who === 'player') {
+					GAME.hp -= amount;
+					UI.showFloatText('player-board', `-${amount}`, "dmg");
+				} else {
+					this.enemy.currentHp -= amount;
+					UI.showFloatText('enemy-board', `-${amount}`, "dmg");
+				}
+				UI.updateHUD();
+			},
+
+			healHero: async function (who, amount) {
+				if (amount <= 0) return;
+				AUDIO.sfx.heal();
+				if (who === 'player') {
+					GAME.hp += amount;
+					UI.showFloatText('player-board', `+${amount}`, "heal");
+				} else {
+					this.enemy.currentHp += amount;
+					UI.showFloatText('enemy-board', `+${amount}`, "heal");
+				}
+				UI.updateHUD();
+			},
+
+			getUnits: function (owner) {
+				return this.units.filter(u => u.owner === owner && u.hp > 0 && !u.dead);
+			}
+		};
+
+		const UI = {
+			screens: ['screen-menu', 'screen-map', 'battle-screen', 'screen-choice', 'screen-reward'],
+
+			showScreen: function (id) {
+				this.screens.forEach(s => document.getElementById(s).classList.remove('active'));
+				document.getElementById(id).classList.add('active');
+			},
+
+			showMap: function (nodes) {
+				const container = document.getElementById('map-nodes');
+				container.innerHTML = '';
+				nodes.forEach(node => {
+					const el = document.createElement('div');
+					el.className = 'map-node';
+					let icon = '📍';
+					if (node.type === 'Warehouse') icon = '📦';
+					if (node.type === 'Downtown') icon = '🏙️';
+					if (node.type === 'Subway') icon = '🚇';
+					if (node.type === 'Park') icon = '🌳';
+					if (node.type === 'Slums') icon = '⛺';
+					if (node.type === 'BOSS') icon = '💀';
+
+					el.innerHTML = `<div>${icon}</div><div style="margin-top:5px;">${node.type}</div>`;
+					el.onclick = () => GAME.handleNodeSelect(node);
+					container.appendChild(el);
+				});
+				this.showScreen('screen-map');
+			},
+
+			showBattle: function () {
+				this.renderBoard();
+				this.renderHand();
+				this.updateHUD();
+				this.showScreen('battle-screen');
+			},
+
+			updateHUD: function () {
+				document.getElementById('player-hp').innerText = GAME.hp;
+				document.getElementById('enemy-hp').innerText = BATTLE.enemy.currentHp;
+				document.getElementById('enemy-name').innerText = BATTLE.enemy.name;
+				document.getElementById('deck-num').innerText = BATTLE.deck.length;
+
+				const container = document.getElementById('ap-display');
+				container.innerHTML = '';
+				for (let i = 0; i < BATTLE.maxMana; i++) {
+					const pip = document.createElement('div');
+					pip.className = 'ap-pip';
+					if (i < BATTLE.currentMana) {
+						pip.classList.add('filled');
+					}
+					container.appendChild(pip);
+				}
+			},
+
+			renderHand: function () {
+				const container = document.getElementById('player-hand');
+				container.innerHTML = '';
+				BATTLE.hand.forEach(card => {
+					const el = this.createCardEl(card);
+					if (BATTLE.currentMana < card.cost) el.classList.add('disabled');
+					el.onclick = () => {
+						if (BATTLE.currentMana >= card.cost) {
+							BATTLE.playCard(card.uid);
+						} else {
+							AUDIO.sfx.click();
+						}
+					};
+					container.appendChild(el);
+				});
+			},
+
+			renderBoard: function () {
+				const pBoard = document.getElementById('player-board');
+				const eBoard = document.getElementById('enemy-board');
+				pBoard.innerHTML = '';
+				eBoard.innerHTML = '';
+
+				BATTLE.units.forEach(unit => {
+					const el = this.createUnitEl(unit);
+					if (unit.owner === 'player') pBoard.appendChild(el);
+					else eBoard.appendChild(el);
+				});
+			},
+
+			createCardEl: function (data) {
+				const ability = ABILITIES[data.abilityId] || ABILITIES['none'];
+				const rarityClass = data.rarity ? data.rarity.toLowerCase() : 'common';
+
+				const div = document.createElement('div');
+				div.className = `card ${rarityClass}`;
+				div.innerHTML = `
+<div class="cost-badge">${data.cost}</div>
+<div class="card-sprite">${data.sprite}</div>
+<div class="card-stats">
+<span class="stat-atk">${data.atk}</span>
+<span class="stat-hp">${data.hp}</span>
+</div>
+<div style="font-size:0.75em; font-weight:bold; margin-top:2px; color:#fff;">${data.name}</div>
+<div class="rarity-badge">${data.rarity}</div>
+<div class="card-desc">${ability.desc}</div>
+`;
+				return div;
+			},
+
+			createUnitEl: function (unit) {
+				const ability = ABILITIES[unit.abilityId] || ABILITIES['none'];
+				const div = document.createElement('div');
+				div.className = `unit ${unit.owner} ${ability.isTaunt ? 'taunt' : ''}`;
+				div.id = `unit-${unit.uid}`;
+				div.innerHTML = `
+<div class="unit-tooltip">
+<b>${ability.name}</b><br>${ability.desc}
+</div>
+<div class="card-sprite">${unit.sprite}</div>
+<div class="card-stats" style="position:absolute; bottom:5px;">
+<span class="stat-atk">${unit.atk}</span>
+<span class="stat-hp">${unit.hp}</span>
+</div>
+`;
+				if (unit.hp <= 0 || unit.dead) div.style.opacity = '0.3';
+				return div;
+			},
+
+			updateUnit: function (unit) {
+				const el = document.getElementById(`unit-${unit.uid}`);
+				if (el) {
+					el.querySelector('.stat-atk').innerText = `${unit.atk}`;
+					el.querySelector('.stat-hp').innerText = `${unit.hp}`;
+					if (unit.hp <= 0 || unit.dead) el.style.opacity = '0.3';
+				}
+			},
+
+			renderRewardList: function (cardList, isAddMode, onSelect) {
+				const container = document.getElementById('reward-container');
+				container.innerHTML = '';
+				cardList.forEach((item, index) => {
+					const id = (typeof item === 'string') ? item : item.id;
+					const data = CARDS_DB[id];
+					const el = this.createCardEl(data);
+					if (!isAddMode) el.style.borderColor = '#d63031';
+					el.onclick = () => {
+						AUDIO.sfx.click();
+						onSelect(id, index);
+					};
+					container.appendChild(el);
+				});
+			},
+
+			animateAttack: function (uid) {
+				const el = document.getElementById(`unit-${uid}`);
+				if (el) {
+					el.classList.add('shake');
+					setTimeout(() => el.classList.remove('shake'), 500);
+				}
+			},
+
+			showFloatText: function (targetId, text, type) {
+				let el = document.getElementById(`unit-${targetId}`);
+				if (!el) el = document.getElementById(targetId);
+				if (el) {
+					const rect = el.getBoundingClientRect();
+					const txt = document.createElement('div');
+					txt.className = `float-text ${type}`;
+					txt.innerText = text;
+					txt.style.left = (rect.left + 20) + 'px';
+					txt.style.top = (rect.top) + 'px';
+					document.body.appendChild(txt);
+					setTimeout(() => txt.remove(), 1000);
+				}
+			}
+		};
+	</script>
+</body>
+
+</html>
