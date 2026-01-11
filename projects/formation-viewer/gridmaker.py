@@ -20,13 +20,14 @@ def add_cell(root: ET.Element, x, y, size=32, fill="#000000"):
 	})
 	return cell
 
-def add_marker(root: ET.Element, x, y, size=32, fill="#ff0000", stroke_width=4, label: str = None):
+def add_marker(root: ET.Element, x, y, size=32, fill="#ff0000", stroke_width=12, label: str = None):
 	marker_group = ET.SubElement(root, "g", { "id": f"Marker_{x}_{y}" })
 	ET.SubElement(marker_group, "line", {
 		"x1": str(x - size/2),
 		"y1": str(y - size/2),
 		"x2": str(x + size/2),
 		"y2": str(y + size/2),
+		"opacity":"0.7",
 		"stroke": fill,
 		"stroke-width": str(stroke_width)
 	})
@@ -35,6 +36,7 @@ def add_marker(root: ET.Element, x, y, size=32, fill="#ff0000", stroke_width=4, 
 		"y1": str(y - size/2),
 		"x2": str(x - size/2),
 		"y2": str(y + size/2),
+		"opacity":"0.7",
 		"stroke": fill,
 		"stroke-width": str(stroke_width)
 	})
@@ -48,7 +50,6 @@ def add_marker(root: ET.Element, x, y, size=32, fill="#ff0000", stroke_width=4, 
 			"text-anchor": "middle",
 			"dominant-baseline": "middle"
 		}).text = label
-
 
 def generate_svg(markers: list = []):
 	tile_size = 32
@@ -103,169 +104,95 @@ def generate_svg(markers: list = []):
 	# Add the XML declaration for better SVG compatibility
 	tree.write(os.path.join(BASE_DIR, "grid.svg"), encoding="utf-8", xml_declaration=True)
 
-def get_marker_silent_wave(
-		mid_point: tuple[int, int], 
-		gap = 3, 
-		total_men = 12, 
-		color = "#ff0000"
-	) -> list[tuple[int, int, str]]:
-	markers: list[tuple[int, int, str]] = []
-	for i in range(0, total_men):
-		_x = mid_point[0] - (total_men-1)*gap/2 + i*gap
-		_y = mid_point[1]
-		markers.append(
-			(_x, _y, color)
-		)
-	return markers
-
-def get_marker_saturn(
-		mid_point: tuple[int, int], 
-		saturn_throw_gap = 6, gap = 3, 
-		total_men = 12, 
-		color = "#4d0000"
-	) -> list[tuple[int, int, str]]:
-	markers: list[tuple[int, int, str]] = []
-	_y_offfset = 0
-	for i in range(0, total_men):
-		_x = mid_point[0]
-		if i % 2 == 0:
-			_y_offfset -= gap
-			_x -= saturn_throw_gap/2
-		else:
-			_x += saturn_throw_gap/2
-		_y = mid_point[1] + _y_offfset
-		markers.append(
-			(_x, _y, color)
-		)
-	return markers
-
-def get_marker_formation(
-		mid_point: tuple[int, int], 
-		formation_pattern: dict[tuple[int, int], str], 
-		gap_multiplier = 1, color = "#000000",
-		center_formation: bool = False
-	) -> list[tuple[int, int, str]]:
-	markers: list[tuple[int, int, str]] = []
-	
-	if not formation_pattern:
-		return []
-	
-	offset_x, offset_y = 0, 0
-
-	if center_formation:
-		all_x = [pos[0] for pos in formation_pattern]
-		all_y = [pos[1] for pos in formation_pattern]
-		min_x, max_x = min(all_x), max(all_x)
-		min_y, max_y = min(all_y), max(all_y)
-		
-		pattern_center_x = (min_x + max_x) / 2.0
-		pattern_center_y = (min_y + max_y) / 2.0
-		
-		offset_x = -pattern_center_x
-		offset_y = -pattern_center_y
-	
-	for relative_pos in formation_pattern:
-		_x = mid_point[0] + (relative_pos[0] + offset_x) * gap_multiplier
-		_y = mid_point[1] + (relative_pos[1] + offset_y) * gap_multiplier
-		markers.append(
-			(_x, _y, color)
-		)
-	return markers
-
-def create_formation_2(inner_spacing = 1, outer_spacing = 2)->dict[tuple[int, int], str]:
-	return {
-		(0, -outer_spacing*2): "",
-		(outer_spacing, -outer_spacing): "",
-		(outer_spacing*2, 0): "",
-		(outer_spacing, outer_spacing): "",
-		(0, outer_spacing*2): "",
-		(-outer_spacing, outer_spacing): "",
-		(-outer_spacing*2, 0): "",
-		(-outer_spacing, -outer_spacing): "",
-
-		(-inner_spacing, 0): "",
-		(inner_spacing, 0): "",
-		(0, -inner_spacing): "",
-		(0, inner_spacing): "",
-	}
 
 def main():
+	CENTER_X = 20*3/2
+	CENTER_Y = 20*3/2
+
+	FORMATION_1_COLOR = "#eeff00"
+	FORMATION_2_COLOR = "#0022ff"
+	FORMATION_3_COLOR = "#ff0000"
+	SW_1_COLOR = "#00ff8c"
+	SW_2_COLOR = "#ff006f"
+	BOX_DISTANCE = 6
+	
 	markers_to_draw = [
+		# Formation 1 (Box)
+		(CENTER_X - BOX_DISTANCE/2 - BOX_DISTANCE, CENTER_Y, FORMATION_1_COLOR),
+		(CENTER_X - BOX_DISTANCE/2, CENTER_Y, FORMATION_1_COLOR),
+		(CENTER_X + BOX_DISTANCE/2, CENTER_Y, FORMATION_1_COLOR),
+		(CENTER_X + BOX_DISTANCE/2 + BOX_DISTANCE, CENTER_Y, FORMATION_1_COLOR),
+
+		(CENTER_X - BOX_DISTANCE/2 - BOX_DISTANCE, CENTER_Y - BOX_DISTANCE, FORMATION_1_COLOR),
+		(CENTER_X - BOX_DISTANCE/2, CENTER_Y - BOX_DISTANCE, FORMATION_1_COLOR),
+		(CENTER_X + BOX_DISTANCE/2, CENTER_Y - BOX_DISTANCE, FORMATION_1_COLOR),
+		(CENTER_X + BOX_DISTANCE/2 + BOX_DISTANCE, CENTER_Y - BOX_DISTANCE, FORMATION_1_COLOR),
+
+		(CENTER_X - BOX_DISTANCE/2 - BOX_DISTANCE, CENTER_Y + BOX_DISTANCE, FORMATION_1_COLOR),
+		(CENTER_X - BOX_DISTANCE/2, CENTER_Y + BOX_DISTANCE, FORMATION_1_COLOR),
+		(CENTER_X + BOX_DISTANCE/2, CENTER_Y + BOX_DISTANCE, FORMATION_1_COLOR),
+		(CENTER_X + BOX_DISTANCE/2 + BOX_DISTANCE, CENTER_Y + BOX_DISTANCE, FORMATION_1_COLOR),
+
+		# Formation 2 (Diamond)
+		(CENTER_X - 4, CENTER_Y, FORMATION_2_COLOR),
+		(CENTER_X + 4, CENTER_Y, FORMATION_2_COLOR),
+		(CENTER_X, CENTER_Y - 4, FORMATION_2_COLOR),
+		(CENTER_X, CENTER_Y + 4, FORMATION_2_COLOR),
+
+		(CENTER_X - 12, CENTER_Y, FORMATION_2_COLOR),
+		(CENTER_X - 6, CENTER_Y - 6, FORMATION_2_COLOR),
+		(CENTER_X, CENTER_Y - 12, FORMATION_2_COLOR),
+		(CENTER_X + 6, CENTER_Y - 6, FORMATION_2_COLOR),
+		(CENTER_X + 12, CENTER_Y, FORMATION_2_COLOR),
+		(CENTER_X + 6, CENTER_Y + 6, FORMATION_2_COLOR),
+		(CENTER_X, CENTER_Y + 12, FORMATION_2_COLOR),
+		(CENTER_X - 6, CENTER_Y + 6, FORMATION_2_COLOR),
+
+		# Formation 3 (Heart)
+		(CENTER_X - 6, CENTER_Y - 3, FORMATION_3_COLOR),
+		(CENTER_X - 12, CENTER_Y - 8, FORMATION_3_COLOR),
+		(CENTER_X - 18, CENTER_Y - 3, FORMATION_3_COLOR),
+		(CENTER_X - 12, CENTER_Y + 2, FORMATION_3_COLOR),
+		(CENTER_X - 6, CENTER_Y + 7, FORMATION_3_COLOR),
+		(CENTER_X, CENTER_Y + 12, FORMATION_3_COLOR),
+		(CENTER_X + 6, CENTER_Y + 7, FORMATION_3_COLOR),
+		(CENTER_X + 12, CENTER_Y + 2, FORMATION_3_COLOR),
+		(CENTER_X + 18, CENTER_Y - 3, FORMATION_3_COLOR),
+		(CENTER_X + 12, CENTER_Y - 8, FORMATION_3_COLOR),
+		(CENTER_X + 6, CENTER_Y - 3, FORMATION_3_COLOR),
+		
+		(CENTER_X, CENTER_Y + 4, FORMATION_3_COLOR),
+		
+		# Silent Wave 1
+		(CENTER_X + 3.5, CENTER_Y + 15, SW_1_COLOR),
+		(CENTER_X + 7.0, CENTER_Y + 12, SW_1_COLOR),
+		(CENTER_X + 10.5, CENTER_Y + 15, SW_1_COLOR),
+		(CENTER_X + 14.0, CENTER_Y + 12, SW_1_COLOR),
+		(CENTER_X + 17.5, CENTER_Y + 15, SW_1_COLOR),
+		(CENTER_X + 21, CENTER_Y + 12, SW_1_COLOR),
+		(CENTER_X, CENTER_Y + 12, SW_1_COLOR),
+		(CENTER_X - 3.5, CENTER_Y + 15, SW_1_COLOR),
+		(CENTER_X - 7.0, CENTER_Y + 12, SW_1_COLOR),
+		(CENTER_X - 10.5, CENTER_Y + 15, SW_1_COLOR),
+		(CENTER_X - 14.0, CENTER_Y + 12, SW_1_COLOR),
+		(CENTER_X - 17.5, CENTER_Y + 15, SW_1_COLOR),
+
+		# Center point
+		(CENTER_X, CENTER_Y, SW_2_COLOR),
+
+		# Perimeter points (calculated via 2*pi*i/11)
+		(CENTER_X + 4.0, CENTER_Y + 0.0, SW_2_COLOR),                  # 0°
+		(CENTER_X + 3.37, CENTER_Y + 2.16, SW_2_COLOR),               # 32.7°
+		(CENTER_X + 1.66, CENTER_Y + 3.64, SW_2_COLOR),               # 65.4°
+		(CENTER_X - 0.57, CENTER_Y + 3.96, SW_2_COLOR),               # 98.2°
+		(CENTER_X - 2.62, CENTER_Y + 3.02, SW_2_COLOR),               # 130.9°
+		(CENTER_X - 3.84, CENTER_Y + 1.13, SW_2_COLOR),               # 163.6°
+		(CENTER_X - 3.84, CENTER_Y - 1.13, SW_2_COLOR),               # 196.4°
+		(CENTER_X - 2.62, CENTER_Y - 3.02, SW_2_COLOR),               # 229.1°
+		(CENTER_X - 0.57, CENTER_Y - 3.96, SW_2_COLOR),               # 261.8°
+		(CENTER_X + 1.66, CENTER_Y - 3.64, SW_2_COLOR),               # 294.5°
+		(CENTER_X + 3.37, CENTER_Y - 2.16, SW_2_COLOR),               # 327.3°
 	]
-
-	# Generate markers for 1st formation
-	markers_to_draw += get_marker_formation(
-		mid_point = (30, 35),
-		formation_pattern = {
-			(0, 0): "IL",
-			(1, 0): "SE",
-			(2, 0): "JD",
-			(3, 0): "EL",
-			(0, -1): "RY",
-			(1, -1): "DM",
-			(2, -1): "ER",
-			(3, -1): "JO",
-			(0, -2): "AL",
-			(1, -2): "CW",
-			(2, -2): "JO",
-			(3, -2): "LR",
-		},
-		color="#0000ff",
-		gap_multiplier=6,
-		center_formation=True
-	)
-
-	# Generate markers for 2nd formation
-	create_formation_2()
-	markers_to_draw += get_marker_formation(
-		mid_point = (30, 35),
-		formation_pattern = create_formation_2(1,1.5),
-		color="#77ff00",
-		gap_multiplier=4,
-		center_formation=True
-	)
-
-	# Generate markers for 3rd formation
-	markers_to_draw += get_marker_formation(
-		mid_point = (30, 37),
-		formation_pattern = {
-			(0, 0): "",
-			
-			(-1, -1): "",
-			(1, -1): "",
-			
-			(-2, -2): "",
-			(0, -2): "",
-			(2, -2): "",
-
-
-			(-1, -3): "",
-			(1, -3): "",
-			(-3, -3): "",
-			(3, -3): "",
-
-			(-2, -4): "",
-			(2, -4): "",
-		},
-		color="#ff9500",
-		gap_multiplier=6,
-		center_formation=True
-	)
-
-	# generate markers for silent wave
-	markers_to_draw += get_marker_silent_wave(
-		mid_point = (30, 40),
-		gap = 3,
-		total_men = 12
-	)
-
-	# Generate markers for saturn toss
-	markers_to_draw += get_marker_saturn(
-		mid_point = (30, 40),
-		saturn_throw_gap = 6,
-		gap = 3,
-		total_men = 12
-	)
 	
 	generate_svg(markers=markers_to_draw)
 	print("grid.svg has been generated!")
