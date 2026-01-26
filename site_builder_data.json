@@ -1,0 +1,169 @@
+{
+	"meta": {
+		"title": "elfiawesome",
+		"description": "Personal portfolio of elfiawesome - Creating game wikis, interactive web experiences, and HTML games."
+	},
+	"branding": {
+		"logo": {
+			"text": "elfi",
+			"accent": ".",
+			"suffix": "awesome"
+		},
+		"colors": {
+			"primary": "#6366f1",
+			"secondary": "#ec4899",
+			"success": "#10b981"
+		}
+	},
+	"navigation": [
+		{
+			"label": "About",
+			"href": "#about"
+		},
+		{
+			"label": "Projects",
+			"href": "#projects"
+		},
+		{
+			"label": "Contact",
+			"href": "#contact"
+		}
+	],
+	"hero": {
+		"label": "Personal Portfolio",
+		"title": {
+			"prefix": "I'm ",
+			"highlight": "elfiawesome"
+		},
+		"description": "Creating game wikis, interactive web experiences, and HTML games. Building resources for gaming communities and having fun along the way.",
+		"buttons": [
+			{
+				"text": "View Projects",
+				"href": "#projects",
+				"type": "primary",
+				"icon": "mdi:arrow-right"
+			},
+			{
+				"text": "GitHub",
+				"href": "https://github.com/elfiawesome",
+				"type": "secondary",
+				"icon": "mdi:github",
+				"external": true
+			}
+		]
+	},
+	"about": {
+		"label": "About",
+		"title": "A bit about me",
+		"section_number": "01",
+		"paragraphs": [
+			"I build <strong>comprehensive game wikis</strong> and interactive web experiences. My focus is on creating valuable resources for gaming communities that are both informative and enjoyable to use.",
+			"From detailed game documentation to engaging <strong>HTML games</strong>, I enjoy building things that people find useful and fun. Every project is an opportunity to learn something new and push creative boundaries."
+		],
+		"stats": [
+			{
+				"value": "2",
+				"label": "Projects"
+			},
+			{
+				"value": "1",
+				"label": "Wikis & Docs"
+			},
+			{
+				"value": "3",
+				"label": "Games"
+			},
+			{
+				"value": "2+",
+				"label": "Years Active"
+			}
+		]
+	},
+	"projects": {
+		"label": "Projects",
+		"title": "What I've built",
+		"section_number": "02",
+		"items": [
+			{
+				"id": "001",
+				"title": "Card Wars Wiki",
+				"description": "",
+				"tags": [
+					"wiki"
+				],
+				"url": "https://elfiawesome.github.io/card-wars-wiki/"
+			},
+			{
+				"id": "002",
+				"title": "Overflight Html Game",
+				"description": "",
+				"tags": [
+					"game"
+				],
+				"url": "./projects/game-wip/game-test.html"
+			},
+			{
+				"id": "003",
+				"title": "Japan Trip Viewer",
+				"description": "",
+				"tags": [
+					"tool"
+				],
+				"url": "https://elfiawesome.github.io/bss-jp-memory/"
+			},
+			{
+				"id": "004",
+				"title": "Chrome Cookie to Netscape Converter",
+				"description": "",
+				"tags": [
+					"tool"
+				],
+				"url": "./projects/chrome-cookie-to-netscape-converter/converter.html"
+			},
+			{
+				"id": "005",
+				"title": "Local Text Encryptor",
+				"description": "",
+				"tags": [
+					"tool"
+				],
+				"url": "./projects/text-encryptor/text-encryptor.html"
+			}
+		]
+	},
+	"contact": {
+		"label": "Contact",
+		"title": "Let's connect",
+		"description": "Interested in collaborating or have questions about my projects? Feel free to reach out through any of these platforms.",
+		"email": "elfiawesome@gmail.com",
+		"socials": [
+			{
+				"platform": "GitHub",
+				"url": "https://github.com/elfiawesome",
+				"icon": "mdi:github"
+			},
+			{
+				"platform": "Website",
+				"url": "https://elfiawesome.github.io",
+				"icon": "mdi:web"
+			}
+		]
+	},
+	"footer": {
+		"copyright": "2024 elfiawesome. All rights reserved.",
+		"socials": [
+			{
+				"url": "https://github.com/elfiawesome",
+				"icon": "mdi:github"
+			},
+			{
+				"url": "#",
+				"icon": "mdi:twitter"
+			},
+			{
+				"url": "#",
+				"icon": "mdi:discord"
+			}
+		]
+	}
+}
