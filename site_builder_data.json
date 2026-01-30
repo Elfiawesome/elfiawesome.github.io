@@ -128,6 +128,15 @@
 					"tool"
 				],
 				"url": "./projects/text-encryptor/text-encryptor.html"
+			},
+			{
+				"id": "006",
+				"title": "SPDS Formation Designer",
+				"description": "",
+				"tags": [
+					"tool"
+				],
+				"url": "./projects/spds-formation-designer/spds-formation-designer.html"
 			}
 		]
 	},

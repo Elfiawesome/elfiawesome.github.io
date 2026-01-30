@@ -1,0 +1,3337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPDS Formation Designer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0d0d0d;
+            --bg-secondary: #161616;
+            --bg-tertiary: #1a1a1a;
+            --bg-elevated: #222222;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-muted: #1e40af;
+            --text-primary: #f5f5f5;
+            --text-secondary: #888888;
+            --text-muted: #555555;
+            --border: #2a2a2a;
+            --border-strong: #404040;
+            --danger: #dc2626;
+            --danger-hover: #b91c1c;
+            --success: #16a34a;
+            --warning: #f59e0b;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+            font-size: 13px;
+        }
+
+        /* Layout */
+        .app {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            grid-template-rows: 48px 1fr;
+            height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            grid-column: 1 / -1;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 12px;
+        }
+
+        .logo {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-icon {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, var(--accent) 0%, #1d4ed8 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 2px;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.1;
+        }
+
+        .logo-title {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .logo-subtitle {
+            font-size: 9px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .header-divider {
+            width: 1px;
+            height: 24px;
+            background: var(--border);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 4px;
+            margin-left: auto;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            background: transparent;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid transparent;
+        }
+
+        .btn:hover {
+            background: var(--bg-elevated);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-outline {
+            border: 1px solid var(--border);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--border-strong);
+            background: var(--bg-elevated);
+        }
+
+        .btn-danger {
+            color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background: rgba(220, 38, 38, 0.1);
+        }
+
+        .btn-icon {
+            padding: 6px;
+            min-width: 28px;
+            justify-content: center;
+        }
+
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 11px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-section {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-header {
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-tertiary);
+        }
+
+        .sidebar-title {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+        }
+
+        .sidebar-content {
+            padding: 8px;
+        }
+
+        /* Formations List */
+        .formations-section {
+            flex: 0 0 auto;
+            max-height: 45%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .formations-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+
+        .formation-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 10px;
+            cursor: pointer;
+            gap: 10px;
+            margin-bottom: 2px;
+            border: 1px solid transparent;
+            background: var(--bg-tertiary);
+        }
+
+        .formation-item:hover {
+            background: var(--bg-elevated);
+        }
+
+        .formation-item.active {
+            border-color: var(--accent);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .formation-color {
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+        }
+
+        .formation-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .formation-name {
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .formation-name-input {
+            background: var(--bg-primary);
+            border: 1px solid var(--accent);
+            color: var(--text-primary);
+            font-size: 12px;
+            font-weight: 500;
+            padding: 2px 6px;
+            width: 100%;
+            outline: none;
+        }
+
+        .formation-count {
+            font-size: 10px;
+            color: var(--text-secondary);
+            margin-top: 1px;
+        }
+
+        .formation-actions {
+            display: flex;
+            gap: 2px;
+            opacity: 0;
+            transition: opacity 0.15s;
+        }
+
+        .formation-item:hover .formation-actions {
+            opacity: 1;
+        }
+
+        .visibility-btn {
+            padding: 4px 6px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 14px;
+            line-height: 1;
+            transition: all 0.15s;
+        }
+
+        .visibility-btn:hover {
+            color: var(--text-primary);
+            background: var(--bg-elevated);
+        }
+
+        .visibility-btn.hidden {
+            opacity: 0.4;
+        }
+
+        /* Markers Section */
+        .markers-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .markers-header-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .markers-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+
+        .marker-item {
+            display: grid;
+            grid-template-columns: auto 1fr auto auto auto;
+            gap: 6px;
+            align-items: center;
+            padding: 6px 8px;
+            background: var(--bg-tertiary);
+            margin-bottom: 2px;
+            border: 1px solid transparent;
+        }
+
+        .marker-item:hover {
+            background: var(--bg-elevated);
+        }
+
+        .marker-item.selected {
+            border-color: var(--accent);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .marker-checkbox {
+            width: 14px;
+            height: 14px;
+            cursor: pointer;
+            accent-color: var(--accent);
+        }
+
+        .marker-name-input {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 12px;
+            padding: 4px 6px;
+            min-width: 0;
+            width: 100%;
+        }
+
+        .marker-name-input:focus {
+            outline: none;
+            background: var(--bg-primary);
+        }
+
+        .marker-coord-input {
+            width: 48px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 11px;
+            padding: 3px 5px;
+            text-align: center;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+        }
+
+        .marker-coord-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .marker-delete-btn {
+            padding: 2px 6px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .marker-delete-btn:hover {
+            color: var(--danger);
+        }
+
+        .empty-state {
+            padding: 20px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        /* Group Actions Bar */
+        .group-actions {
+            padding: 8px;
+            background: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border);
+            display: none;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .group-actions.active {
+            display: flex;
+        }
+
+        .group-actions .btn {
+            padding: 4px 8px;
+            font-size: 11px;
+        }
+
+        .selection-count {
+            font-size: 11px;
+            color: var(--text-secondary);
+            padding: 4px 8px;
+        }
+
+        /* Main Canvas Area */
+        .main {
+            background: var(--bg-primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .canvas-viewport {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            cursor: crosshair;
+        }
+
+        .canvas-container {
+            transform-origin: 0 0;
+            position: relative;
+        }
+
+        #gridCanvas {
+            display: block;
+        }
+
+        #backgroundImage {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        /* Selection Box */
+        .selection-box {
+            position: fixed;
+            border: 1px dashed var(--accent);
+            background: rgba(59, 130, 246, 0.1);
+            pointer-events: none;
+            z-index: 100;
+            display: none;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 4px;
+            display: flex;
+            gap: 2px;
+            z-index: 10;
+        }
+
+        .tool-btn {
+            padding: 8px 14px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tool-btn:hover {
+            color: var(--text-primary);
+            background: var(--bg-tertiary);
+        }
+
+        .tool-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .toolbar-divider {
+            width: 1px;
+            background: var(--border);
+            margin: 4px 2px;
+        }
+
+        /* Snap Controls */
+        .snap-control {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0 8px;
+        }
+
+        .snap-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .snap-select {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 11px;
+            padding: 4px 6px;
+            cursor: pointer;
+        }
+
+        .snap-select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        /* Status Bar */
+        .status-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            padding: 6px 12px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 11px;
+            color: var(--text-secondary);
+            z-index: 10;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-label {
+            color: var(--text-muted);
+        }
+
+        .status-value {
+            color: var(--text-primary);
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+        }
+
+        .status-spacer {
+            flex: 1;
+        }
+
+        /* Zoom Controls */
+        .zoom-controls {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .zoom-btn {
+            padding: 2px 8px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .zoom-btn:hover {
+            background: var(--bg-elevated);
+        }
+
+        .zoom-value {
+            min-width: 50px;
+            text-align: center;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.15s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            width: 100%;
+            max-width: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 18px;
+            padding: 4px;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-footer {
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 8px 10px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 13px;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .form-row-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+        }
+
+        .color-input-wrapper {
+            display: flex;
+            gap: 8px;
+        }
+
+        .color-picker {
+            -webkit-appearance: none;
+            border: 1px solid var(--border);
+            width: 40px;
+            height: 34px;
+            padding: 0;
+            cursor: pointer;
+            background: none;
+        }
+
+        .color-picker::-webkit-color-swatch-wrapper {
+            padding: 2px;
+        }
+
+        .color-picker::-webkit-color-swatch {
+            border: none;
+        }
+
+        /* File Drop Zone */
+        .file-drop-zone {
+            border: 2px dashed var(--border);
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .file-drop-zone:hover,
+        .file-drop-zone.dragover {
+            border-color: var(--accent);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .file-drop-zone-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .file-drop-zone-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .file-drop-zone-hint {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .uploaded-image-preview {
+            margin-top: 12px;
+            position: relative;
+        }
+
+        .uploaded-image-preview img {
+            max-width: 100%;
+            max-height: 150px;
+            border: 1px solid var(--border);
+        }
+
+        .remove-image-btn {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: var(--danger);
+            border: none;
+            color: white;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        /* Context Menu */
+        .context-menu {
+            position: fixed;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 4px;
+            z-index: 1000;
+            min-width: 160px;
+            display: none;
+        }
+
+        .context-menu.active {
+            display: block;
+        }
+
+        .context-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .context-item:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .context-item.danger {
+            color: var(--danger);
+        }
+
+        .context-shortcut {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .context-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 4px 0;
+        }
+
+        /* Keyboard Shortcuts */
+        .shortcuts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .shortcut-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 10px;
+            background: var(--bg-tertiary);
+            font-size: 11px;
+        }
+
+        .shortcut-key {
+            background: var(--bg-primary);
+            padding: 2px 6px;
+            border: 1px solid var(--border);
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 10px;
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+        }
+
+        .toast {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 10px 16px;
+            font-size: 12px;
+            animation: fadeIn 0.2s ease;
+            margin-top: 8px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Progress Overlay */
+        .progress-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+        }
+
+        .progress-overlay.active {
+            display: flex;
+        }
+
+        .progress-text {
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .progress-bar {
+            width: 300px;
+            height: 4px;
+            background: var(--bg-tertiary);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.2s;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--border-strong);
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">SP</div>
+                <div class="logo-text">
+                    <span class="logo-title">SPDS Formation Designer</span>
+                    <span class="logo-subtitle">Silent Precision Drill Squad • SAF MP</span>
+                </div>
+            </div>
+            <div class="header-divider"></div>
+            <div class="header-actions">
+                <button class="btn btn-outline" onclick="openShortcutsModal()" title="Keyboard Shortcuts">⌨ Shortcuts</button>
+                <button class="btn btn-outline" onclick="openSettings()">Settings</button>
+                <button class="btn btn-outline" onclick="loadFile()" title="Ctrl+O">Load</button>
+                <button class="btn btn-outline" onclick="saveFile()" title="Ctrl+S">Save</button>
+                <div class="header-divider"></div>
+                <button class="btn btn-outline" onclick="exportPNG()">Export PNG</button>
+                <button class="btn btn-primary" onclick="exportGIF()">Export GIF</button>
+            </div>
+        </header>
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-section formations-section">
+                <div class="sidebar-header">
+                    <span class="sidebar-title">Formations</span>
+                    <button class="btn btn-sm btn-primary" onclick="openAddFormation()">+ Add</button>
+                </div>
+                <div class="formations-list" id="formationsList"></div>
+            </div>
+            <div class="sidebar-section markers-section">
+                <div class="sidebar-header">
+                    <div class="markers-header-row">
+                        <span class="sidebar-title">Markers</span>
+                        <span id="markerCount" style="font-size: 11px; color: var(--text-muted);">0</span>
+                    </div>
+                </div>
+                <div class="group-actions" id="groupActions">
+                    <span class="selection-count" id="selectionCount">0 selected</span>
+                    <button class="btn btn-outline" onclick="moveSelectedMarkers(-1, 0)" title="Move Left">← Move</button>
+                    <button class="btn btn-outline" onclick="moveSelectedMarkers(1, 0)" title="Move Right">→</button>
+                    <button class="btn btn-outline" onclick="moveSelectedMarkers(0, -1)" title="Move Up">↑</button>
+                    <button class="btn btn-outline" onclick="moveSelectedMarkers(0, 1)" title="Move Down">↓</button>
+                    <button class="btn btn-outline" onclick="alignMarkersHorizontal()" title="Align Horizontally">≡ Align H</button>
+                    <button class="btn btn-outline" onclick="alignMarkersVertical()" title="Align Vertically">⦀ Align V</button>
+                    <button class="btn btn-outline" onclick="duplicateSelectedMarkers()" title="Ctrl+D">⧉ Duplicate</button>
+                    <button class="btn btn-danger" onclick="deleteSelectedMarkers()" title="Delete">× Delete</button>
+                </div>
+                <div class="markers-list" id="markersList"></div>
+            </div>
+        </aside>
+
+        <!-- Main Canvas Area -->
+        <main class="main">
+            <div class="toolbar">
+                <button class="tool-btn active" data-tool="add" onclick="setTool('add')" title="1">
+                    <span>+</span> Add
+                </button>
+                <button class="tool-btn" data-tool="select" onclick="setTool('select')" title="2">
+                    <span>◇</span> Select
+                </button>
+                <button class="tool-btn" data-tool="move" onclick="setTool('move')" title="3">
+                    <span>↔</span> Move
+                </button>
+                <button class="tool-btn" data-tool="pan" onclick="setTool('pan')" title="4">
+                    <span>✋</span> Pan
+                </button>
+                <button class="tool-btn" data-tool="delete" onclick="setTool('delete')" title="5">
+                    <span>×</span> Delete
+                </button>
+                <div class="toolbar-divider"></div>
+                <div class="snap-control">
+                    <span class="snap-label">Snap:</span>
+                    <select class="snap-select" id="snapSize" onchange="updateSnapSize()">
+                        <option value="0">Off</option>
+                        <option value="0.25">0.25</option>
+                        <option value="0.5" selected>0.5</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="canvas-viewport" id="canvasViewport">
+                <div class="canvas-container" id="canvasContainer">
+                    <img id="backgroundImage" style="display: none;">
+                    <canvas id="gridCanvas"></canvas>
+                </div>
+            </div>
+
+            <div class="selection-box" id="selectionBox"></div>
+
+            <div class="status-bar">
+                <div class="status-item">
+                    <span class="status-label">Cursor:</span>
+                    <span class="status-value" id="cursorPos">0, 0</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Pan:</span>
+                    <span class="status-value" id="panPos">0, 0</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Selected:</span>
+                    <span class="status-value" id="selectedInfo">None</span>
+                </div>
+                <div class="status-spacer"></div>
+                <div class="zoom-controls">
+                    <button class="zoom-btn" onclick="zoomOut()">−</button>
+                    <span class="zoom-value" id="zoomLevel">100%</span>
+                    <button class="zoom-btn" onclick="zoomIn()">+</button>
+                    <button class="zoom-btn" onclick="resetView()">Reset</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Context Menu -->
+    <div class="context-menu" id="contextMenu">
+        <div class="context-item" onclick="editSelectedMarker()">
+            <span>Edit Marker</span>
+            <span class="context-shortcut">E</span>
+        </div>
+        <div class="context-item" onclick="duplicateSelectedMarkers()">
+            <span>Duplicate</span>
+            <span class="context-shortcut">Ctrl+D</span>
+        </div>
+        <div class="context-item" onclick="copyMarkers()">
+            <span>Copy</span>
+            <span class="context-shortcut">Ctrl+C</span>
+        </div>
+        <div class="context-item" onclick="pasteMarkers()">
+            <span>Paste</span>
+            <span class="context-shortcut">Ctrl+V</span>
+        </div>
+        <div class="context-divider"></div>
+        <div class="context-item" onclick="selectAllMarkers()">
+            <span>Select All</span>
+            <span class="context-shortcut">Ctrl+A</span>
+        </div>
+        <div class="context-divider"></div>
+        <div class="context-item danger" onclick="deleteSelectedMarkers()">
+            <span>Delete</span>
+            <span class="context-shortcut">Del</span>
+        </div>
+    </div>
+
+    <!-- Add Formation Modal -->
+    <div class="modal-overlay" id="addFormationModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">Add Formation</span>
+                <button class="modal-close" onclick="closeModal('addFormationModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Name</label>
+                    <input type="text" class="form-input" id="newFormationName" placeholder="Formation name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Color</label>
+                    <div class="color-input-wrapper">
+                        <input type="color" class="color-picker" id="newFormationColor" value="#ef4444">
+                        <input type="text" class="form-input" id="newFormationColorHex" value="#ef4444">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('addFormationModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="addFormation()">Add Formation</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Formation Modal -->
+    <div class="modal-overlay" id="editFormationModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">Edit Formation</span>
+                <button class="modal-close" onclick="closeModal('editFormationModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Name</label>
+                    <input type="text" class="form-input" id="editFormationName">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Color</label>
+                    <div class="color-input-wrapper">
+                        <input type="color" class="color-picker" id="editFormationColor">
+                        <input type="text" class="form-input" id="editFormationColorHex">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('editFormationModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveFormationEdit()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Marker Modal -->
+    <div class="modal-overlay" id="editMarkerModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">Edit Marker</span>
+                <button class="modal-close" onclick="closeModal('editMarkerModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Name</label>
+                    <input type="text" class="form-input" id="editMarkerName" placeholder="Marker name">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">X Position</label>
+                        <input type="number" class="form-input" id="editMarkerX" step="0.25">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Y Position</label>
+                        <input type="number" class="form-input" id="editMarkerY" step="0.25">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('editMarkerModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveMarkerEdit()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal" style="max-width: 500px;">
+            <div class="modal-header">
+                <span class="modal-title">Grid Settings</span>
+                <button class="modal-close" onclick="closeModal('settingsModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Custom Grid Background</label>
+                    <div class="file-drop-zone" id="gridDropZone" onclick="document.getElementById('gridImageInput').click()">
+                        <div class="file-drop-zone-icon">🖼️</div>
+                        <div class="file-drop-zone-text">Click or drag image here</div>
+                        <div class="file-drop-zone-hint">PNG, JPG, or SVG recommended</div>
+                    </div>
+                    <div class="uploaded-image-preview" id="gridImagePreview" style="display: none;">
+                        <img id="gridPreviewImg">
+                        <button class="remove-image-btn" onclick="removeGridImage()">×</button>
+                    </div>
+                    <input type="file" id="gridImageInput" accept="image/*" style="display: none" onchange="handleGridImageUpload(event)">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Image Opacity</label>
+                        <input type="range" class="form-input" id="settingImageOpacity" min="0" max="100" value="50" style="padding: 0;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Image Scale (%)</label>
+                        <input type="number" class="form-input" id="settingImageScale" value="100" min="10" max="500">
+                    </div>
+                </div>
+                <hr style="border: none; border-top: 1px solid var(--border); margin: 16px 0;">
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label class="form-label">Tile Size</label>
+                        <input type="number" class="form-input" id="settingTileSize" value="32" min="16" max="64">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Chunk Size</label>
+                        <input type="number" class="form-input" id="settingChunkSize" value="20" min="5" max="50">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Border Width</label>
+                        <input type="number" class="form-input" id="settingBorderWidth" value="1" min="1" max="5">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Chunks X</label>
+                        <input type="number" class="form-input" id="settingChunksX" value="3" min="1" max="10">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Chunks Y</label>
+                        <input type="number" class="form-input" id="settingChunksY" value="3" min="1" max="10">
+                    </div>
+                </div>
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label class="form-label">Primary Color</label>
+                        <input type="color" class="color-picker" id="settingPrimaryColor" value="#a89ea9" style="width: 100%; height: 32px;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Secondary Color</label>
+                        <input type="color" class="color-picker" id="settingSecondaryColor" value="#8e98a5" style="width: 100%; height: 32px;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Border Color</label>
+                        <input type="color" class="color-picker" id="settingBorderColor" value="#4a4a4a" style="width: 100%; height: 32px;">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">GIF Frame Duration (ms)</label>
+                        <input type="number" class="form-input" id="settingGifDuration" value="1000" min="100" max="5000" step="100">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Transition Steps</label>
+                        <input type="number" class="form-input" id="settingTransitionSteps" value="10" min="1" max="30">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('settingsModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveSettings()">Apply</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shortcuts Modal -->
+    <div class="modal-overlay" id="shortcutsModal">
+        <div class="modal" style="max-width: 500px;">
+            <div class="modal-header">
+                <span class="modal-title">Keyboard Shortcuts</span>
+                <button class="modal-close" onclick="closeModal('shortcutsModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="shortcuts-grid">
+                    <div class="shortcut-item"><span>Add Tool</span><span class="shortcut-key">1</span></div>
+                    <div class="shortcut-item"><span>Select Tool</span><span class="shortcut-key">2</span></div>
+                    <div class="shortcut-item"><span>Move Tool</span><span class="shortcut-key">3</span></div>
+                    <div class="shortcut-item"><span>Pan Tool</span><span class="shortcut-key">4</span></div>
+                    <div class="shortcut-item"><span>Delete Tool</span><span class="shortcut-key">5</span></div>
+                    <div class="shortcut-item"><span>Temp Pan</span><span class="shortcut-key">Space</span></div>
+                    <div class="shortcut-item"><span>Select All</span><span class="shortcut-key">Ctrl+A</span></div>
+                    <div class="shortcut-item"><span>Deselect All</span><span class="shortcut-key">Esc</span></div>
+                    <div class="shortcut-item"><span>Copy</span><span class="shortcut-key">Ctrl+C</span></div>
+                    <div class="shortcut-item"><span>Paste</span><span class="shortcut-key">Ctrl+V</span></div>
+                    <div class="shortcut-item"><span>Duplicate</span><span class="shortcut-key">Ctrl+D</span></div>
+                    <div class="shortcut-item"><span>Delete</span><span class="shortcut-key">Del / Backspace</span></div>
+                    <div class="shortcut-item"><span>Save</span><span class="shortcut-key">Ctrl+S</span></div>
+                    <div class="shortcut-item"><span>Open</span><span class="shortcut-key">Ctrl+O</span></div>
+                    <div class="shortcut-item"><span>Undo</span><span class="shortcut-key">Ctrl+Z</span></div>
+                    <div class="shortcut-item"><span>Redo</span><span class="shortcut-key">Ctrl+Y</span></div>
+                    <div class="shortcut-item"><span>Edit Marker</span><span class="shortcut-key">E</span></div>
+                    <div class="shortcut-item"><span>Zoom In/Out</span><span class="shortcut-key">Scroll</span></div>
+                    <div class="shortcut-item"><span>Multi-select</span><span class="shortcut-key">Ctrl+Click</span></div>
+                    <div class="shortcut-item"><span>Add to selection</span><span class="shortcut-key">Shift+Click</span></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeModal('shortcutsModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Overlay -->
+    <div class="progress-overlay" id="progressOverlay">
+        <div class="progress-text" id="progressText">Generating GIF...</div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Hidden file input -->
+    <input type="file" id="fileInput" accept=".json" style="display: none">
+
+    <script>
+        // ============================================
+        // STATE
+        // ============================================
+        const state = {
+            formations: [],
+            activeFormationId: null,
+            selectedMarkerIds: new Set(),
+            tool: 'add',
+            snapSize: 0.5,
+            zoom: 1,
+            pan: { x: 0, y: 0 },
+            clipboard: [],
+            undoStack: [],
+            redoStack: [],
+            settings: {
+                tileSize: 32,
+                chunkSize: 20,
+                chunksX: 3,
+                chunksY: 3,
+                borderWidth: 1,
+                primaryColor: '#a89ea9',
+                secondaryColor: '#8e98a5',
+                borderColor: '#4a4a4a',
+                gifDuration: 1000,
+                transitionSteps: 10,
+                backgroundImage: null,
+                imageOpacity: 50,
+                imageScale: 100
+            }
+        };
+
+        let canvas, ctx;
+        let viewport, container;
+        let isPanning = false;
+        let isDraggingMarker = false;
+        let isSelecting = false;
+        let selectionStart = { x: 0, y: 0 };
+        let panStart = { x: 0, y: 0 };
+        let dragStart = { x: 0, y: 0 };
+        let draggedMarkerOriginalPositions = new Map();
+        let editingFormationId = null;
+        let editingMarkerId = null;
+        let mousePos = { x: 0, y: 0 };
+        let inlineEditingFormationId = null;
+        let addToSelectionOnBoxSelect = false;
+        let lastSelectedMarkerId = null;
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        document.addEventListener('DOMContentLoaded', init);
+
+        function init() {
+            canvas = document.getElementById('gridCanvas');
+            ctx = canvas.getContext('2d');
+            viewport = document.getElementById('canvasViewport');
+            container = document.getElementById('canvasContainer');
+
+            loadFromStorage();
+            
+            if (state.formations.length === 0) {
+                state.formations.push(createFormation('Formation 1', '#ef4444'));
+                state.activeFormationId = state.formations[0].id;
+            }
+
+            initCanvas();
+            setupEvents();
+            render();
+            centerView();
+        }
+
+        function initCanvas() {
+            const { tileSize, chunkSize, chunksX, chunksY } = state.settings;
+            canvas.width = chunkSize * tileSize * chunksX;
+            canvas.height = chunkSize * tileSize * chunksY;
+            updateBackgroundImage();
+            updateTransform();
+        }
+
+        function updateBackgroundImage() {
+            const bgImg = document.getElementById('backgroundImage');
+            if (state.settings.backgroundImage) {
+                bgImg.src = state.settings.backgroundImage;
+                bgImg.style.display = 'block';
+                bgImg.style.opacity = state.settings.imageOpacity / 100;
+                bgImg.style.width = (canvas.width * state.settings.imageScale / 100) + 'px';
+                bgImg.style.height = 'auto';
+            } else {
+                bgImg.style.display = 'none';
+            }
+        }
+
+        function setupEvents() {
+            // Canvas events
+            viewport.addEventListener('mousedown', onMouseDown);
+            viewport.addEventListener('mousemove', onMouseMove);
+            viewport.addEventListener('mouseup', onMouseUp);
+            viewport.addEventListener('mouseleave', onMouseUp);
+            viewport.addEventListener('wheel', onWheel, { passive: false });
+            viewport.addEventListener('contextmenu', onContextMenu);
+
+            // Click outside context menu
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.context-menu')) {
+                    document.getElementById('contextMenu').classList.remove('active');
+                }
+            });
+
+            // Keyboard
+            document.addEventListener('keydown', onKeyDown);
+            document.addEventListener('keyup', onKeyUp);
+
+            // Color sync
+            syncColorInputs('newFormationColor', 'newFormationColorHex');
+            syncColorInputs('editFormationColor', 'editFormationColorHex');
+
+            // File input
+            document.getElementById('fileInput').addEventListener('change', onFileSelect);
+
+            // Grid image drop zone
+            setupDropZone();
+        }
+
+        function setupDropZone() {
+            const dropZone = document.getElementById('gridDropZone');
+            
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            });
+
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('dragover');
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+                const file = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    loadImageFile(file);
+                }
+            });
+        }
+
+        function syncColorInputs(colorId, hexId) {
+            const colorEl = document.getElementById(colorId);
+            const hexEl = document.getElementById(hexId);
+            
+            colorEl.addEventListener('input', () => hexEl.value = colorEl.value);
+            hexEl.addEventListener('input', () => {
+                if (/^#[0-9A-Fa-f]{6}$/.test(hexEl.value)) {
+                    colorEl.value = hexEl.value;
+                }
+            });
+        }
+
+        // ============================================
+        // UNDO/REDO
+        // ============================================
+        function saveUndoState() {
+            const snapshot = JSON.stringify(state.formations);
+            state.undoStack.push(snapshot);
+            if (state.undoStack.length > 50) state.undoStack.shift();
+            state.redoStack = [];
+        }
+
+        function undo() {
+            if (state.undoStack.length === 0) return;
+            state.redoStack.push(JSON.stringify(state.formations));
+            state.formations = JSON.parse(state.undoStack.pop());
+            state.selectedMarkerIds.clear();
+            render();
+            toast('Undo');
+        }
+
+        function redo() {
+            if (state.redoStack.length === 0) return;
+            state.undoStack.push(JSON.stringify(state.formations));
+            state.formations = JSON.parse(state.redoStack.pop());
+            state.selectedMarkerIds.clear();
+            render();
+            toast('Redo');
+        }
+
+        // ============================================
+        // RENDERING
+        // ============================================
+        function render() {
+            drawGrid();
+            drawMarkers();
+            renderUI();
+            saveToStorage();
+        }
+
+        function drawGrid() {
+            const { tileSize, chunkSize, chunksX, chunksY, borderWidth, primaryColor, secondaryColor, borderColor } = state.settings;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let cx = 0; cx < chunksX; cx++) {
+                for (let cy = 0; cy < chunksY; cy++) {
+                    for (let lx = 0; lx < chunkSize; lx++) {
+                        for (let ly = 0; ly < chunkSize; ly++) {
+                            const x = (cx * chunkSize + lx) * tileSize;
+                            const y = (cy * chunkSize + ly) * tileSize;
+
+                            const isBorder = lx < borderWidth || lx >= chunkSize - borderWidth ||
+                                           ly < borderWidth || ly >= chunkSize - borderWidth;
+
+                            if (isBorder) {
+                                ctx.fillStyle = borderColor;
+                            } else {
+                                ctx.fillStyle = (cx + cy) % 2 === 0 ? primaryColor : secondaryColor;
+                            }
+
+                            ctx.fillRect(x, y, tileSize, tileSize);
+
+                            // Cell outline
+                            ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+                            ctx.lineWidth = 0.5;
+                            ctx.strokeRect(x, y, tileSize, tileSize);
+                        }
+                    }
+
+                    // Chunk border
+                    ctx.strokeStyle = borderColor;
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(cx * chunkSize * tileSize, cy * chunkSize * tileSize, 
+                                   chunkSize * tileSize, chunkSize * tileSize);
+                }
+            }
+        }
+
+        function drawMarkers() {
+            const { tileSize } = state.settings;
+
+            // Build a map of positions grouped by marker name
+            const positionMap = new Map();
+            
+            state.formations.forEach((formation, formationIndex) => {
+                if (!formation.visible) return;
+                formation.markers.forEach(marker => {
+                    const key = `${marker.x.toFixed(2)},${marker.y.toFixed(2)}`;
+                    if (!positionMap.has(key)) {
+                        positionMap.set(key, []);
+                    }
+                    positionMap.get(key).push({ marker, formation, formationIndex });
+                });
+            });
+
+            // Draw markers
+            positionMap.forEach((markersAtPos) => {
+                // Sort by formation order
+                markersAtPos.sort((a, b) => a.formationIndex - b.formationIndex);
+                
+                const firstMarker = markersAtPos[0].marker;
+                const x = firstMarker.x * tileSize;
+                const y = firstMarker.y * tileSize;
+                const size = tileSize * 0.7;
+                
+                // Check if any marker at this position is selected
+                const isSelected = markersAtPos.some(m => state.selectedMarkerIds.has(m.marker.id));
+
+                // Selection box
+                if (isSelected) {
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([4, 4]);
+                    ctx.strokeRect(x - tileSize * 0.6, y - tileSize * 0.6, tileSize * 1.2, tileSize * 1.2);
+                    ctx.setLineDash([]);
+                }
+
+                // Get unique colors in formation order
+                const colors = markersAtPos.map(m => m.formation.color);
+                
+                if (colors.length === 1) {
+                    drawXMarker(ctx, x, y, size, colors[0], tileSize);
+                } else {
+                    drawStripedXMarker(ctx, x, y, size, colors, tileSize);
+                }
+
+                // Draw label - combine names in formation order
+                const names = markersAtPos.map(m => m.marker.name).filter(n => n);
+                if (names.length > 0) {
+                    const displayName = names.join(' / ');
+                    const fontSize = Math.max(10, tileSize / 3);
+                    ctx.font = `600 ${fontSize}px -apple-system, sans-serif`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'top';
+
+                    const textWidth = ctx.measureText(displayName).width;
+                    const labelY = y + size / 2 + 4;
+
+                    ctx.fillStyle = 'rgba(0,0,0,0.75)';
+                    ctx.fillRect(x - textWidth / 2 - 4, labelY - 1, textWidth + 8, fontSize + 4);
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillText(displayName, x, labelY);
+                }
+            });
+        }
+
+        function drawXMarker(context, x, y, size, color, tileSize) {
+            context.strokeStyle = color;
+            context.lineWidth = tileSize / 4;
+            context.lineCap = 'square';
+            context.globalAlpha = 0.85;
+
+            context.beginPath();
+            context.moveTo(x - size / 2, y - size / 2);
+            context.lineTo(x + size / 2, y + size / 2);
+            context.stroke();
+
+            context.beginPath();
+            context.moveTo(x + size / 2, y - size / 2);
+            context.lineTo(x - size / 2, y + size / 2);
+            context.stroke();
+
+            context.globalAlpha = 1;
+        }
+
+        function drawStripedXMarker(context, x, y, size, colors, tileSize) {
+            const lineWidth = tileSize / 4;
+            const stripeWidth = lineWidth / colors.length;
+            
+            context.lineCap = 'square';
+            context.globalAlpha = 0.85;
+
+            // Draw each color as a stripe
+            colors.forEach((color, i) => {
+                context.strokeStyle = color;
+                context.lineWidth = stripeWidth;
+                
+                // Calculate offset for this stripe
+                const offset = (i - (colors.length - 1) / 2) * stripeWidth;
+                
+                // First line of X (top-left to bottom-right)
+                context.beginPath();
+                context.moveTo(x - size / 2 + offset, y - size / 2);
+                context.lineTo(x + size / 2 + offset, y + size / 2);
+                context.stroke();
+
+                // Second line of X (top-right to bottom-left)
+                context.beginPath();
+                context.moveTo(x + size / 2 - offset, y - size / 2);
+                context.lineTo(x - size / 2 - offset, y + size / 2);
+                context.stroke();
+            });
+
+            context.globalAlpha = 1;
+        }
+
+        function renderUI() {
+            renderFormationsList();
+            renderMarkersList();
+            updateStatusBar();
+            updateGroupActions();
+        }
+
+        function renderFormationsList() {
+            const list = document.getElementById('formationsList');
+            list.innerHTML = state.formations.map(f => `
+                <div class="formation-item ${f.id === state.activeFormationId ? 'active' : ''}" 
+                     onclick="selectFormation('${f.id}')"
+                     ondblclick="startInlineEditFormation('${f.id}', event)">
+                    <button class="visibility-btn ${f.visible ? '' : 'hidden'}" 
+                            onclick="toggleFormationVisibility(event, '${f.id}')"
+                            title="${f.visible ? 'Hide formation' : 'Show formation'}">
+                        ${f.visible ? '◉' : '○'}
+                    </button>
+                    <div class="formation-color" style="background: ${f.color}"></div>
+                    <div class="formation-info">
+                        ${inlineEditingFormationId === f.id 
+                            ? `<input type="text" class="formation-name-input" id="inlineFormationName" 
+                                     value="${escapeHtml(f.name)}" 
+                                     onclick="event.stopPropagation()"
+                                     onkeydown="handleInlineEditKeydown(event, '${f.id}')"
+                                     onblur="finishInlineEditFormation('${f.id}')">`
+                            : `<div class="formation-name">${escapeHtml(f.name)}</div>`
+                        }
+                        <div class="formation-count">${f.markers.length} marker${f.markers.length !== 1 ? 's' : ''}</div>
+                    </div>
+                    <div class="formation-actions">
+                        <button class="btn btn-sm btn-icon" onclick="event.stopPropagation(); openEditFormation('${f.id}')">✎</button>
+                        <button class="btn btn-sm btn-icon btn-danger" onclick="event.stopPropagation(); deleteFormation('${f.id}')">×</button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Focus inline input if editing
+            if (inlineEditingFormationId) {
+                setTimeout(() => {
+                    const input = document.getElementById('inlineFormationName');
+                    if (input) {
+                        input.focus();
+                        input.select();
+                    }
+                }, 0);
+            }
+        }
+
+        function renderMarkersList() {
+            const list = document.getElementById('markersList');
+            const countEl = document.getElementById('markerCount');
+            const formation = state.formations.find(f => f.id === state.activeFormationId);
+
+            if (!formation || formation.markers.length === 0) {
+                list.innerHTML = '<div class="empty-state">No markers. Click on the grid to add.</div>';
+                countEl.textContent = '0';
+                return;
+            }
+
+            countEl.textContent = formation.markers.length;
+            list.innerHTML = formation.markers.map(m => `
+                <div class="marker-item ${state.selectedMarkerIds.has(m.id) ? 'selected' : ''}" 
+                     onclick="handleMarkerItemClick(event, '${m.id}')">
+                    <input type="checkbox" class="marker-checkbox" 
+                           ${state.selectedMarkerIds.has(m.id) ? 'checked' : ''}
+                           onclick="event.stopPropagation(); toggleMarkerSelection('${m.id}')">
+                    <input type="text" class="marker-name-input" 
+                           value="${escapeHtml(m.name || '')}" 
+                           placeholder="Name"
+                           onclick="event.stopPropagation()"
+                           onchange="updateMarkerName('${m.id}', this.value)">
+                    <input type="number" class="marker-coord-input" 
+                           value="${m.x}" 
+                           step="${state.snapSize || 0.25}"
+                           onclick="event.stopPropagation()"
+                           onchange="updateMarkerCoord('${m.id}', 'x', this.value)">
+                    <input type="number" class="marker-coord-input" 
+                           value="${m.y}" 
+                           step="${state.snapSize || 0.25}"
+                           onclick="event.stopPropagation()"
+                           onchange="updateMarkerCoord('${m.id}', 'y', this.value)">
+                    <button class="marker-delete-btn" onclick="event.stopPropagation(); deleteMarker('${m.id}')">×</button>
+                </div>
+            `).join('');
+        }
+
+        function updateGroupActions() {
+            const groupActions = document.getElementById('groupActions');
+            const selectionCount = document.getElementById('selectionCount');
+            const count = state.selectedMarkerIds.size;
+
+            if (count > 0) {
+                groupActions.classList.add('active');
+                selectionCount.textContent = `${count} selected`;
+            } else {
+                groupActions.classList.remove('active');
+            }
+        }
+
+        function updateStatusBar() {
+            document.getElementById('cursorPos').textContent = `${mousePos.x.toFixed(1)}, ${mousePos.y.toFixed(1)}`;
+            document.getElementById('panPos').textContent = `${state.pan.x.toFixed(0)}, ${state.pan.y.toFixed(0)}`;
+            
+            const count = state.selectedMarkerIds.size;
+            if (count === 0) {
+                document.getElementById('selectedInfo').textContent = 'None';
+            } else if (count === 1) {
+                const markerId = [...state.selectedMarkerIds][0];
+                const result = findMarkerById(markerId);
+                if (result) {
+                    document.getElementById('selectedInfo').textContent = 
+                        `${result.marker.name || 'Unnamed'} (${result.marker.x}, ${result.marker.y})`;
+                }
+            } else {
+                document.getElementById('selectedInfo').textContent = `${count} markers`;
+            }
+        }
+
+        function updateTransform() {
+            container.style.transform = `translate(${state.pan.x}px, ${state.pan.y}px) scale(${state.zoom})`;
+            document.getElementById('zoomLevel').textContent = `${Math.round(state.zoom * 100)}%`;
+        }
+
+        // ============================================
+        // MOUSE EVENTS
+        // ============================================
+        function onMouseDown(e) {
+            if (e.button === 1 || (e.button === 0 && state.tool === 'pan')) {
+                isPanning = true;
+                panStart = { x: e.clientX - state.pan.x, y: e.clientY - state.pan.y };
+                viewport.style.cursor = 'grabbing';
+                e.preventDefault();
+                return;
+            }
+
+            if (e.button === 0) {
+                const pos = getGridPosition(e);
+                const snapped = snapPosition(pos.x, pos.y);
+
+                if (state.tool === 'add') {
+                    saveUndoState();
+                    addMarker(snapped.x, snapped.y);
+                } else if (state.tool === 'select') {
+                    const marker = findMarkerAt(pos.x, pos.y);
+                    if (marker) {
+                        if (e.ctrlKey || e.metaKey) {
+                            toggleMarkerSelection(marker.id);
+                        } else if (e.shiftKey) {
+                            state.selectedMarkerIds.add(marker.id);
+                        } else {
+                            if (!state.selectedMarkerIds.has(marker.id)) {
+                                state.selectedMarkerIds.clear();
+                                state.selectedMarkerIds.add(marker.id);
+                            }
+                        }
+                        lastSelectedMarkerId = marker.id;
+                        render();
+                    } else {
+                        addToSelectionOnBoxSelect = e.ctrlKey || e.metaKey || e.shiftKey;
+                        if (!addToSelectionOnBoxSelect) {
+                            state.selectedMarkerIds.clear();
+                        }
+                        isSelecting = true;
+                        selectionStart = { x: e.clientX, y: e.clientY };
+                        render();
+                    }
+                } else if (state.tool === 'move') {
+                    const marker = findMarkerAt(pos.x, pos.y);
+                    if (marker) {
+                        if (!state.selectedMarkerIds.has(marker.id)) {
+                            if (!e.ctrlKey && !e.metaKey && !e.shiftKey) {
+                                state.selectedMarkerIds.clear();
+                            }
+                            state.selectedMarkerIds.add(marker.id);
+                        }
+                        saveUndoState();
+                        isDraggingMarker = true;
+                        dragStart = pos;
+                        draggedMarkerOriginalPositions.clear();
+                        state.selectedMarkerIds.forEach(id => {
+                            const result = findMarkerById(id);
+                            if (result) {
+                                draggedMarkerOriginalPositions.set(id, { x: result.marker.x, y: result.marker.y });
+                            }
+                        });
+                        viewport.style.cursor = 'grabbing';
+                        render();
+                    }
+                } else if (state.tool === 'delete') {
+                    const marker = findMarkerAt(pos.x, pos.y);
+                    if (marker) {
+                        saveUndoState();
+                        deleteMarker(marker.id);
+                    }
+                }
+            }
+        }
+
+        function onMouseMove(e) {
+            const pos = getGridPosition(e);
+            mousePos = pos;
+
+            if (isPanning) {
+                state.pan.x = e.clientX - panStart.x;
+                state.pan.y = e.clientY - panStart.y;
+                updateTransform();
+                updateStatusBar();
+                return;
+            }
+
+            if (isSelecting) {
+                const box = document.getElementById('selectionBox');
+                const minX = Math.min(selectionStart.x, e.clientX);
+                const minY = Math.min(selectionStart.y, e.clientY);
+                const maxX = Math.max(selectionStart.x, e.clientX);
+                const maxY = Math.max(selectionStart.y, e.clientY);
+
+                box.style.display = 'block';
+                box.style.left = minX + 'px';
+                box.style.top = minY + 'px';
+                box.style.width = (maxX - minX) + 'px';
+                box.style.height = (maxY - minY) + 'px';
+                return;
+            }
+
+            if (isDraggingMarker) {
+                const snappedPos = snapPosition(pos.x, pos.y);
+                const snappedStart = snapPosition(dragStart.x, dragStart.y);
+                const dx = snappedPos.x - snappedStart.x;
+                const dy = snappedPos.y - snappedStart.y;
+
+                state.selectedMarkerIds.forEach(id => {
+                    const result = findMarkerById(id);
+                    const original = draggedMarkerOriginalPositions.get(id);
+                    if (result && original) {
+                        result.marker.x = snapPosition(original.x + dx, 0).x;
+                        result.marker.y = snapPosition(0, original.y + dy).y;
+                    }
+                });
+                render();
+                return;
+            }
+
+            updateStatusBar();
+        }
+
+        function onMouseUp(e) {
+            if (isPanning) {
+                isPanning = false;
+                viewport.style.cursor = getCursor();
+            }
+
+            if (isSelecting) {
+                isSelecting = false;
+                const box = document.getElementById('selectionBox');
+                box.style.display = 'none';
+
+                const rect = viewport.getBoundingClientRect();
+                const minX = (Math.min(selectionStart.x, e.clientX) - rect.left - state.pan.x) / state.zoom / state.settings.tileSize;
+                const minY = (Math.min(selectionStart.y, e.clientY) - rect.top - state.pan.y) / state.zoom / state.settings.tileSize;
+                const maxX = (Math.max(selectionStart.x, e.clientX) - rect.left - state.pan.x) / state.zoom / state.settings.tileSize;
+                const maxY = (Math.max(selectionStart.y, e.clientY) - rect.top - state.pan.y) / state.zoom / state.settings.tileSize;
+
+                state.formations.forEach(formation => {
+                    if (!formation.visible) return;
+                    formation.markers.forEach(marker => {
+                        if (marker.x >= minX && marker.x <= maxX && marker.y >= minY && marker.y <= maxY) {
+                            state.selectedMarkerIds.add(marker.id);
+                        }
+                    });
+                });
+                addToSelectionOnBoxSelect = false;
+                render();
+            }
+
+            if (isDraggingMarker) {
+                isDraggingMarker = false;
+                draggedMarkerOriginalPositions.clear();
+                viewport.style.cursor = getCursor();
+            }
+        }
+
+        function onWheel(e) {
+            e.preventDefault();
+            
+            const rect = viewport.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            
+            const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
+            const newZoom = Math.max(0.1, Math.min(5, state.zoom * zoomFactor));
+            
+            const scale = newZoom / state.zoom;
+            state.pan.x = mouseX - (mouseX - state.pan.x) * scale;
+            state.pan.y = mouseY - (mouseY - state.pan.y) * scale;
+            state.zoom = newZoom;
+            
+            updateTransform();
+        }
+
+        function onContextMenu(e) {
+            e.preventDefault();
+            
+            const pos = getGridPosition(e);
+            const marker = findMarkerAt(pos.x, pos.y);
+
+            if (marker) {
+                if (!state.selectedMarkerIds.has(marker.id)) {
+                    state.selectedMarkerIds.clear();
+                    state.selectedMarkerIds.add(marker.id);
+                }
+                render();
+            }
+
+            const menu = document.getElementById('contextMenu');
+            menu.style.left = `${e.clientX}px`;
+            menu.style.top = `${e.clientY}px`;
+            menu.classList.add('active');
+        }
+
+        function onKeyDown(e) {
+            const isInputFocused = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA';
+            const ctrl = e.ctrlKey || e.metaKey;
+
+            if (ctrl) {
+                switch (e.key.toLowerCase()) {
+                    case 's':
+                        e.preventDefault();
+                        saveFile();
+                        return;
+                    case 'o':
+                        e.preventDefault();
+                        loadFile();
+                        return;
+                }
+                
+                if (isInputFocused) return;
+                
+                switch (e.key.toLowerCase()) {
+                    case 'a':
+                        e.preventDefault();
+                        selectAllMarkers();
+                        break;
+                    case 'c':
+                        e.preventDefault();
+                        copyMarkers();
+                        break;
+                    case 'v':
+                        e.preventDefault();
+                        pasteMarkers();
+                        break;
+                    case 'd':
+                        e.preventDefault();
+                        duplicateSelectedMarkers();
+                        break;
+                    case 'z':
+                        e.preventDefault();
+                        undo();
+                        break;
+                    case 'y':
+                        e.preventDefault();
+                        redo();
+                        break;
+                }
+                return;
+            }
+
+            if (isInputFocused) return;
+
+            switch (e.key) {
+                case 'Delete':
+                case 'Backspace':
+                    if (state.selectedMarkerIds.size > 0) {
+                        e.preventDefault();
+                        deleteSelectedMarkers();
+                    }
+                    break;
+                case 'Escape':
+                    state.selectedMarkerIds.clear();
+                    closeAllModals();
+                    render();
+                    break;
+                case ' ':
+                    if (!e.repeat) {
+                        e.preventDefault();
+                        state.previousTool = state.tool;
+                        setTool('pan');
+                    }
+                    break;
+                case 'e':
+                case 'E':
+                    if (state.selectedMarkerIds.size === 1) {
+                        editSelectedMarker();
+                    }
+                    break;
+                case '1': setTool('add'); break;
+                case '2': setTool('select'); break;
+                case '3': setTool('move'); break;
+                case '4': setTool('pan'); break;
+                case '5': setTool('delete'); break;
+                case 'ArrowLeft':
+                    if (state.selectedMarkerIds.size > 0) {
+                        e.preventDefault();
+                        moveSelectedMarkers(-(state.snapSize || 0.5), 0);
+                    }
+                    break;
+                case 'ArrowRight':
+                    if (state.selectedMarkerIds.size > 0) {
+                        e.preventDefault();
+                        moveSelectedMarkers(state.snapSize || 0.5, 0);
+                    }
+                    break;
+                case 'ArrowUp':
+                    if (state.selectedMarkerIds.size > 0) {
+                        e.preventDefault();
+                        moveSelectedMarkers(0, -(state.snapSize || 0.5));
+                    }
+                    break;
+                case 'ArrowDown':
+                    if (state.selectedMarkerIds.size > 0) {
+                        e.preventDefault();
+                        moveSelectedMarkers(0, state.snapSize || 0.5);
+                    }
+                    break;
+            }
+        }
+
+        function onKeyUp(e) {
+            if (e.key === ' ' && state.previousTool) {
+                setTool(state.previousTool);
+                state.previousTool = null;
+            }
+        }
+
+        // ============================================
+        // HELPERS
+        // ============================================
+        function getGridPosition(e) {
+            const rect = viewport.getBoundingClientRect();
+            const x = (e.clientX - rect.left - state.pan.x) / state.zoom;
+            const y = (e.clientY - rect.top - state.pan.y) / state.zoom;
+            return { x: x / state.settings.tileSize, y: y / state.settings.tileSize };
+        }
+
+        function snapPosition(x, y) {
+            if (state.snapSize <= 0) return { x, y };
+            return {
+                x: Math.round(x / state.snapSize) * state.snapSize,
+                y: Math.round(y / state.snapSize) * state.snapSize
+            };
+        }
+
+        function getCursor() {
+            switch (state.tool) {
+                case 'add': return 'crosshair';
+                case 'select': return 'default';
+                case 'move': return 'move';
+                case 'pan': return 'grab';
+                case 'delete': return 'crosshair';
+                default: return 'default';
+            }
+        }
+
+        function createFormation(name, color) {
+            return {
+                id: uid(),
+                name,
+                color,
+                visible: true,
+                markers: []
+            };
+        }
+
+        function findMarkerAt(x, y) {
+            const threshold = 0.8;
+            for (const formation of state.formations) {
+                if (!formation.visible) continue;
+                for (const marker of formation.markers) {
+                    if (Math.abs(marker.x - x) < threshold && Math.abs(marker.y - y) < threshold) {
+                        return marker;
+                    }
+                }
+            }
+            return null;
+        }
+
+        function findMarkerById(id) {
+            for (const formation of state.formations) {
+                const marker = formation.markers.find(m => m.id === id);
+                if (marker) return { marker, formation };
+            }
+            return null;
+        }
+
+        function uid() {
+            return Math.random().toString(36).substr(2, 9);
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function toast(msg) {
+            const container = document.getElementById('toastContainer');
+            const el = document.createElement('div');
+            el.className = 'toast';
+            el.textContent = msg;
+            container.appendChild(el);
+            setTimeout(() => el.remove(), 3000);
+        }
+
+        // ============================================
+        // TOOLS
+        // ============================================
+        function setTool(tool) {
+            state.tool = tool;
+            document.querySelectorAll('.tool-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tool === tool);
+            });
+            viewport.style.cursor = getCursor();
+        }
+
+        function updateSnapSize() {
+            state.snapSize = parseFloat(document.getElementById('snapSize').value);
+        }
+
+        // ============================================
+        // FORMATIONS
+        // ============================================
+        function selectFormation(id) {
+            state.activeFormationId = id;
+            state.selectedMarkerIds.clear();
+            render();
+        }
+
+        function toggleFormationVisibility(event, id) {
+            event.stopPropagation();
+            event.preventDefault();
+            const formation = state.formations.find(f => f.id === id);
+            if (formation) {
+                formation.visible = !formation.visible;
+                render();
+            }
+        }
+
+        function startInlineEditFormation(id, event) {
+            event.stopPropagation();
+            event.preventDefault();
+            inlineEditingFormationId = id;
+            render();
+        }
+
+        function handleInlineEditKeydown(event, id) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                finishInlineEditFormation(id);
+            } else if (event.key === 'Escape') {
+                event.preventDefault();
+                inlineEditingFormationId = null;
+                render();
+            }
+        }
+
+        function finishInlineEditFormation(id) {
+            const input = document.getElementById('inlineFormationName');
+            if (input && inlineEditingFormationId === id) {
+                const formation = state.formations.find(f => f.id === id);
+                if (formation) {
+                    formation.name = input.value.trim() || formation.name;
+                }
+            }
+            inlineEditingFormationId = null;
+            render();
+        }
+
+        function openAddFormation() {
+            document.getElementById('newFormationName').value = `Formation ${state.formations.length + 1}`;
+            const color = '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
+            document.getElementById('newFormationColor').value = color;
+            document.getElementById('newFormationColorHex').value = color;
+            openModal('addFormationModal');
+        }
+
+        function addFormation() {
+            const name = document.getElementById('newFormationName').value.trim();
+            const color = document.getElementById('newFormationColor').value;
+
+            if (!name) {
+                toast('Please enter a name');
+                return;
+            }
+
+            saveUndoState();
+            const formation = createFormation(name, color);
+            state.formations.push(formation);
+            state.activeFormationId = formation.id;
+            closeModal('addFormationModal');
+            render();
+        }
+
+        function openEditFormation(id) {
+            const formation = state.formations.find(f => f.id === id);
+            if (!formation) return;
+
+            editingFormationId = id;
+            document.getElementById('editFormationName').value = formation.name;
+            document.getElementById('editFormationColor').value = formation.color;
+            document.getElementById('editFormationColorHex').value = formation.color;
+            openModal('editFormationModal');
+        }
+
+        function saveFormationEdit() {
+            const formation = state.formations.find(f => f.id === editingFormationId);
+            if (!formation) return;
+
+            saveUndoState();
+            formation.name = document.getElementById('editFormationName').value.trim();
+            formation.color = document.getElementById('editFormationColor').value;
+            closeModal('editFormationModal');
+            render();
+        }
+
+        function deleteFormation(id) {
+            if (state.formations.length <= 1) {
+                toast('Cannot delete the last formation');
+                return;
+            }
+
+            saveUndoState();
+            state.formations = state.formations.filter(f => f.id !== id);
+            if (state.activeFormationId === id) {
+                state.activeFormationId = state.formations[0].id;
+            }
+            render();
+        }
+
+        // ============================================
+        // MARKERS
+        // ============================================
+        function addMarker(x, y) {
+            const formation = state.formations.find(f => f.id === state.activeFormationId);
+            if (!formation) {
+                toast('Select a formation first');
+                return;
+            }
+
+            const marker = { id: uid(), x, y, name: '' };
+            formation.markers.push(marker);
+            state.selectedMarkerIds.clear();
+            state.selectedMarkerIds.add(marker.id);
+            render();
+        }
+
+        function handleMarkerItemClick(event, id) {
+            if (event.ctrlKey || event.metaKey) {
+                toggleMarkerSelection(id);
+            } else if (event.shiftKey) {
+                state.selectedMarkerIds.add(id);
+                render();
+            } else {
+                state.selectedMarkerIds.clear();
+                state.selectedMarkerIds.add(id);
+                render();
+            }
+        }
+
+        function toggleMarkerSelection(id) {
+            if (state.selectedMarkerIds.has(id)) {
+                state.selectedMarkerIds.delete(id);
+            } else {
+                state.selectedMarkerIds.add(id);
+            }
+            render();
+        }
+
+        function selectAllMarkers() {
+            const formation = state.formations.find(f => f.id === state.activeFormationId);
+            if (formation) {
+                formation.markers.forEach(m => state.selectedMarkerIds.add(m.id));
+                render();
+                toast(`Selected ${formation.markers.length} markers`);
+            }
+        }
+
+        function updateMarkerName(id, name) {
+            const result = findMarkerById(id);
+            if (result) {
+                result.marker.name = name;
+                render();
+            }
+        }
+
+        function updateMarkerCoord(id, coord, value) {
+            const result = findMarkerById(id);
+            if (result) {
+                result.marker[coord] = parseFloat(value);
+                render();
+            }
+        }
+
+        function deleteMarker(id) {
+            for (const formation of state.formations) {
+                const idx = formation.markers.findIndex(m => m.id === id);
+                if (idx !== -1) {
+                    formation.markers.splice(idx, 1);
+                    state.selectedMarkerIds.delete(id);
+                    render();
+                    return;
+                }
+            }
+        }
+
+        function deleteSelectedMarkers() {
+            if (state.selectedMarkerIds.size === 0) return;
+            saveUndoState();
+            
+            state.selectedMarkerIds.forEach(id => {
+                for (const formation of state.formations) {
+                    const idx = formation.markers.findIndex(m => m.id === id);
+                    if (idx !== -1) {
+                        formation.markers.splice(idx, 1);
+                        break;
+                    }
+                }
+            });
+            
+            const count = state.selectedMarkerIds.size;
+            state.selectedMarkerIds.clear();
+            closeContextMenu();
+            render();
+            toast(`Deleted ${count} marker(s)`);
+        }
+
+        function moveSelectedMarkers(dx, dy) {
+            if (state.selectedMarkerIds.size === 0) return;
+            saveUndoState();
+
+            state.selectedMarkerIds.forEach(id => {
+                const result = findMarkerById(id);
+                if (result) {
+                    result.marker.x += dx;
+                    result.marker.y += dy;
+                }
+            });
+            render();
+        }
+
+        function alignMarkersHorizontal() {
+            if (state.selectedMarkerIds.size < 2) {
+                toast('Select at least 2 markers');
+                return;
+            }
+            saveUndoState();
+
+            let avgY = 0;
+            let count = 0;
+            state.selectedMarkerIds.forEach(id => {
+                const result = findMarkerById(id);
+                if (result) {
+                    avgY += result.marker.y;
+                    count++;
+                }
+            });
+            avgY /= count;
+            avgY = snapPosition(0, avgY).y;
+
+            state.selectedMarkerIds.forEach(id => {
+                const result = findMarkerById(id);
+                if (result) {
+                    result.marker.y = avgY;
+                }
+            });
+            render();
+            toast('Aligned horizontally');
+        }
+
+        function alignMarkersVertical() {
+            if (state.selectedMarkerIds.size < 2) {
+                toast('Select at least 2 markers');
+                return;
+            }
+            saveUndoState();
+
+            let avgX = 0;
+            let count = 0;
+            state.selectedMarkerIds.forEach(id => {
+                const result = findMarkerById(id);
+                if (result) {
+                    avgX += result.marker.x;
+                    count++;
+                }
+            });
+            avgX /= count;
+            avgX = snapPosition(avgX, 0).x;
+
+            state.selectedMarkerIds.forEach(id => {
+                const result = findMarkerById(id);
+                if (result) {
+                    result.marker.x = avgX;
+                }
+            });
+            render();
+            toast('Aligned vertically');
+        }
+
+        function copyMarkers() {
+            if (state.selectedMarkerIds.size === 0) {
+                toast('No markers selected');
+                return;
+            }
+
+            state.clipboard = [];
+            state.selectedMarkerIds.forEach(id => {
+                const result = findMarkerById(id);
+                if (result) {
+                    state.clipboard.push({
+                        x: result.marker.x,
+                        y: result.marker.y,
+                        name: result.marker.name
+                    });
+                }
+            });
+            closeContextMenu();
+            toast(`Copied ${state.clipboard.length} marker(s)`);
+        }
+
+        function pasteMarkers() {
+            if (state.clipboard.length === 0) {
+                toast('Nothing to paste');
+                return;
+            }
+
+            const formation = state.formations.find(f => f.id === state.activeFormationId);
+            if (!formation) {
+                toast('Select a formation first');
+                return;
+            }
+
+            saveUndoState();
+            state.selectedMarkerIds.clear();
+
+            state.clipboard.forEach(m => {
+                const newMarker = {
+                    id: uid(),
+                    x: m.x + 1,
+                    y: m.y + 1,
+                    name: m.name
+                };
+                formation.markers.push(newMarker);
+                state.selectedMarkerIds.add(newMarker.id);
+            });
+
+            closeContextMenu();
+            render();
+            toast(`Pasted ${state.clipboard.length} marker(s)`);
+        }
+
+        function duplicateSelectedMarkers() {
+            if (state.selectedMarkerIds.size === 0) {
+                toast('No markers selected');
+                return;
+            }
+
+            saveUndoState();
+            const newIds = [];
+
+            state.selectedMarkerIds.forEach(id => {
+                const result = findMarkerById(id);
+                if (result) {
+                    const newMarker = {
+                        id: uid(),
+                        x: result.marker.x + 1,
+                        y: result.marker.y + 1,
+                        name: result.marker.name ? result.marker.name + ' copy' : ''
+                    };
+                    result.formation.markers.push(newMarker);
+                    newIds.push(newMarker.id);
+                }
+            });
+
+            state.selectedMarkerIds.clear();
+            newIds.forEach(id => state.selectedMarkerIds.add(id));
+            closeContextMenu();
+            render();
+            toast(`Duplicated ${newIds.length} marker(s)`);
+        }
+
+        function editSelectedMarker() {
+            if (state.selectedMarkerIds.size !== 1) return;
+            
+            const id = [...state.selectedMarkerIds][0];
+            const result = findMarkerById(id);
+            if (!result) return;
+
+            editingMarkerId = id;
+            document.getElementById('editMarkerName').value = result.marker.name || '';
+            document.getElementById('editMarkerX').value = result.marker.x;
+            document.getElementById('editMarkerY').value = result.marker.y;
+            
+            closeContextMenu();
+            openModal('editMarkerModal');
+        }
+
+        function saveMarkerEdit() {
+            const result = findMarkerById(editingMarkerId);
+            if (!result) return;
+
+            saveUndoState();
+            result.marker.name = document.getElementById('editMarkerName').value;
+            result.marker.x = parseFloat(document.getElementById('editMarkerX').value);
+            result.marker.y = parseFloat(document.getElementById('editMarkerY').value);
+            
+            closeModal('editMarkerModal');
+            render();
+        }
+
+        // ============================================
+        // VIEW
+        // ============================================
+        function zoomIn() {
+            state.zoom = Math.min(5, state.zoom * 1.2);
+            updateTransform();
+        }
+
+        function zoomOut() {
+            state.zoom = Math.max(0.1, state.zoom / 1.2);
+            updateTransform();
+        }
+
+        function resetView() {
+            state.zoom = 1;
+            centerView();
+        }
+
+        function centerView() {
+            const rect = viewport.getBoundingClientRect();
+            state.pan.x = (rect.width - canvas.width * state.zoom) / 2;
+            state.pan.y = (rect.height - canvas.height * state.zoom) / 2;
+            updateTransform();
+        }
+
+        // ============================================
+        // MODALS
+        // ============================================
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function closeAllModals() {
+            document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+            closeContextMenu();
+        }
+
+        function closeContextMenu() {
+            document.getElementById('contextMenu').classList.remove('active');
+        }
+
+        function openShortcutsModal() {
+            openModal('shortcutsModal');
+        }
+
+        // ============================================
+        // GRID IMAGE UPLOAD
+        // ============================================
+        function handleGridImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                loadImageFile(file);
+            }
+        }
+
+        function loadImageFile(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                state.settings.backgroundImage = e.target.result;
+                document.getElementById('gridPreviewImg').src = e.target.result;
+                document.getElementById('gridImagePreview').style.display = 'block';
+                updateBackgroundImage();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeGridImage() {
+            state.settings.backgroundImage = null;
+            document.getElementById('gridImagePreview').style.display = 'none';
+            document.getElementById('gridImageInput').value = '';
+            updateBackgroundImage();
+        }
+
+        // ============================================
+        // SETTINGS
+        // ============================================
+        function openSettings() {
+            const s = state.settings;
+            document.getElementById('settingTileSize').value = s.tileSize;
+            document.getElementById('settingChunkSize').value = s.chunkSize;
+            document.getElementById('settingBorderWidth').value = s.borderWidth;
+            document.getElementById('settingChunksX').value = s.chunksX;
+            document.getElementById('settingChunksY').value = s.chunksY;
+            document.getElementById('settingPrimaryColor').value = s.primaryColor;
+            document.getElementById('settingSecondaryColor').value = s.secondaryColor;
+            document.getElementById('settingBorderColor').value = s.borderColor;
+            document.getElementById('settingGifDuration').value = s.gifDuration;
+            document.getElementById('settingTransitionSteps').value = s.transitionSteps || 10;
+            document.getElementById('settingImageOpacity').value = s.imageOpacity;
+            document.getElementById('settingImageScale').value = s.imageScale;
+
+            if (s.backgroundImage) {
+                document.getElementById('gridPreviewImg').src = s.backgroundImage;
+                document.getElementById('gridImagePreview').style.display = 'block';
+            } else {
+                document.getElementById('gridImagePreview').style.display = 'none';
+            }
+
+            openModal('settingsModal');
+        }
+
+        function saveSettings() {
+            state.settings.tileSize = parseInt(document.getElementById('settingTileSize').value);
+            state.settings.chunkSize = parseInt(document.getElementById('settingChunkSize').value);
+            state.settings.borderWidth = parseInt(document.getElementById('settingBorderWidth').value);
+            state.settings.chunksX = parseInt(document.getElementById('settingChunksX').value);
+            state.settings.chunksY = parseInt(document.getElementById('settingChunksY').value);
+            state.settings.primaryColor = document.getElementById('settingPrimaryColor').value;
+            state.settings.secondaryColor = document.getElementById('settingSecondaryColor').value;
+            state.settings.borderColor = document.getElementById('settingBorderColor').value;
+            state.settings.gifDuration = parseInt(document.getElementById('settingGifDuration').value);
+            state.settings.transitionSteps = parseInt(document.getElementById('settingTransitionSteps').value);
+            state.settings.imageOpacity = parseInt(document.getElementById('settingImageOpacity').value);
+            state.settings.imageScale = parseInt(document.getElementById('settingImageScale').value);
+
+            initCanvas();
+            closeModal('settingsModal');
+            render();
+            centerView();
+            toast('Settings applied');
+        }
+
+        // ============================================
+        // FILE OPERATIONS
+        // ============================================
+        function saveFile() {
+            const data = {
+                version: '2.0',
+                appName: 'SPDS Formation Designer',
+                formations: state.formations,
+                settings: state.settings,
+                activeFormationId: state.activeFormationId
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'spds-formation.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            toast('Saved');
+        }
+
+        function loadFile() {
+            document.getElementById('fileInput').click();
+        }
+
+        function onFileSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                try {
+                    const data = JSON.parse(ev.target.result);
+                    saveUndoState();
+                    if (data.formations) state.formations = data.formations;
+                    if (data.settings) state.settings = { ...state.settings, ...data.settings };
+                    if (data.activeFormationId) state.activeFormationId = data.activeFormationId;
+                    state.selectedMarkerIds.clear();
+                    initCanvas();
+                    render();
+                    centerView();
+                    toast('Loaded');
+                } catch (err) {
+                    toast('Invalid file');
+                }
+            };
+            reader.readAsText(file);
+            e.target.value = '';
+        }
+
+        async function exportPNG() {
+            const visible = state.formations.filter(f => f.visible);
+            
+            // Export combined formation
+            const exportCanvas = renderExportCanvas(visible);
+            downloadCanvas(exportCanvas, 'spds-formation-all.png');
+            
+            // Export each individual formation
+            for (const formation of visible) {
+                const singleCanvas = renderExportCanvas([formation]);
+                downloadCanvas(singleCanvas, `spds-formation-${formation.name.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.png`);
+                await new Promise(r => setTimeout(r, 100));
+            }
+            
+            toast(`Exported ${visible.length + 1} PNG files`);
+        }
+
+        function downloadCanvas(canvas, filename) {
+            const url = canvas.toDataURL('image/png');
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+        }
+
+        function renderExportCanvas(formationsToRender) {
+            const { tileSize, chunkSize, chunksX, chunksY, borderWidth, primaryColor, secondaryColor, borderColor } = state.settings;
+            
+            const expCanvas = document.createElement('canvas');
+            const expCtx = expCanvas.getContext('2d');
+            expCanvas.width = chunkSize * tileSize * chunksX;
+            expCanvas.height = chunkSize * tileSize * chunksY;
+
+            // Background image if exists
+            if (state.settings.backgroundImage) {
+                const img = new Image();
+                img.src = state.settings.backgroundImage;
+                expCtx.globalAlpha = state.settings.imageOpacity / 100;
+                const scaledWidth = expCanvas.width * state.settings.imageScale / 100;
+                const scaledHeight = (img.height / img.width) * scaledWidth;
+                expCtx.drawImage(img, 0, 0, scaledWidth, scaledHeight);
+                expCtx.globalAlpha = 1;
+            }
+
+            // Grid
+            for (let cx = 0; cx < chunksX; cx++) {
+                for (let cy = 0; cy < chunksY; cy++) {
+                    for (let lx = 0; lx < chunkSize; lx++) {
+                        for (let ly = 0; ly < chunkSize; ly++) {
+                            const x = (cx * chunkSize + lx) * tileSize;
+                            const y = (cy * chunkSize + ly) * tileSize;
+
+                            const isBorder = lx < borderWidth || lx >= chunkSize - borderWidth ||
+                                           ly < borderWidth || ly >= chunkSize - borderWidth;
+
+                            expCtx.fillStyle = isBorder ? borderColor : ((cx + cy) % 2 === 0 ? primaryColor : secondaryColor);
+                            expCtx.fillRect(x, y, tileSize, tileSize);
+
+                            expCtx.strokeStyle = 'rgba(0,0,0,0.15)';
+                            expCtx.lineWidth = 0.5;
+                            expCtx.strokeRect(x, y, tileSize, tileSize);
+                        }
+                    }
+
+                    expCtx.strokeStyle = borderColor;
+                    expCtx.lineWidth = 2;
+                    expCtx.strokeRect(cx * chunkSize * tileSize, cy * chunkSize * tileSize, 
+                                   chunkSize * tileSize, chunkSize * tileSize);
+                }
+            }
+
+            // Build position map
+            const positionMap = new Map();
+            formationsToRender.forEach((formation, formationIndex) => {
+                formation.markers.forEach(marker => {
+                    const key = `${marker.x.toFixed(2)},${marker.y.toFixed(2)}`;
+                    if (!positionMap.has(key)) {
+                        positionMap.set(key, []);
+                    }
+                    positionMap.get(key).push({ marker, formation, formationIndex });
+                });
+            });
+
+            // Draw markers
+            positionMap.forEach((markersAtPos) => {
+                markersAtPos.sort((a, b) => a.formationIndex - b.formationIndex);
+                
+                const firstMarker = markersAtPos[0].marker;
+                const x = firstMarker.x * tileSize;
+                const y = firstMarker.y * tileSize;
+                const size = tileSize * 0.7;
+
+                const colors = markersAtPos.map(m => m.formation.color);
+                
+                if (colors.length === 1) {
+                    drawXMarker(expCtx, x, y, size, colors[0], tileSize);
+                } else {
+                    drawStripedXMarker(expCtx, x, y, size, colors, tileSize);
+                }
+
+                // Labels
+                const names = markersAtPos.map(m => m.marker.name).filter(n => n);
+                if (names.length > 0) {
+                    const displayName = names.join(' / ');
+                    const fontSize = Math.max(10, tileSize / 3);
+                    expCtx.font = `600 ${fontSize}px -apple-system, sans-serif`;
+                    expCtx.textAlign = 'center';
+                    expCtx.textBaseline = 'top';
+
+                    const textWidth = expCtx.measureText(displayName).width;
+                    const labelY = y + size / 2 + 4;
+
+                    expCtx.fillStyle = 'rgba(0,0,0,0.75)';
+                    expCtx.fillRect(x - textWidth / 2 - 4, labelY - 1, textWidth + 8, fontSize + 4);
+
+                    expCtx.fillStyle = '#ffffff';
+                    expCtx.fillText(displayName, x, labelY);
+                }
+            });
+
+            return expCanvas;
+        }
+
+        async function exportGIF() {
+            const visible = state.formations.filter(f => f.visible);
+            if (visible.length < 2) {
+                toast('Need at least 2 visible formations for GIF');
+                return;
+            }
+
+            const progress = document.getElementById('progressOverlay');
+            const fill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            progress.classList.add('active');
+
+            try {
+                const { tileSize, chunkSize, chunksX, chunksY, transitionSteps } = state.settings;
+                const width = chunkSize * tileSize * chunksX;
+                const height = chunkSize * tileSize * chunksY;
+
+                const gif = new GIFEncoder(width, height);
+                gif.setRepeat(0);
+                gif.start();
+
+                // Build marker position maps for each formation
+                const formationMarkerMaps = visible.map(formation => {
+                    const map = new Map();
+                    formation.markers.forEach(marker => {
+                        if (marker.name) {
+                            map.set(marker.name, { x: marker.x, y: marker.y });
+                        }
+                    });
+                    return { formation, map };
+                });
+
+                let totalFrames = 0;
+                for (let i = 0; i < visible.length; i++) {
+                    totalFrames += 1; // Hold frame
+                    if (i < visible.length - 1) {
+                        totalFrames += transitionSteps; // Transition frames
+                    }
+                }
+                totalFrames += transitionSteps; // Loop back transition
+
+                let currentFrame = 0;
+
+                for (let i = 0; i < visible.length; i++) {
+                    progressText.textContent = `Rendering formation ${i + 1}/${visible.length}...`;
+                    
+                    // Render hold frame for current formation
+                    const currentFormations = visible.slice(0, i + 1);
+                    const holdCanvas = renderExportCanvas(currentFormations);
+                    gif.setDelay(state.settings.gifDuration);
+                    const holdData = holdCanvas.getContext('2d').getImageData(0, 0, width, height);
+                    gif.addFrame(holdData.data, width, height);
+                    currentFrame++;
+                    fill.style.width = `${(currentFrame / totalFrames) * 100}%`;
+                    await new Promise(r => setTimeout(r, 10));
+
+                    // Render transition to next formation
+                    if (i < visible.length - 1) {
+                        const nextFormation = visible[i + 1];
+                        const currentFormation = visible[i];
+                        
+                        for (let step = 1; step <= transitionSteps; step++) {
+                            const t = step / transitionSteps;
+                            const transitionCanvas = renderTransitionFrame(
+                                currentFormations, 
+                                nextFormation, 
+                                formationMarkerMaps[i].map,
+                                formationMarkerMaps[i + 1].map,
+                                t
+                            );
+                            gif.setDelay(50);
+                            const transData = transitionCanvas.getContext('2d').getImageData(0, 0, width, height);
+                            gif.addFrame(transData.data, width, height);
+                            currentFrame++;
+                            fill.style.width = `${(currentFrame / totalFrames) * 100}%`;
+                            await new Promise(r => setTimeout(r, 10));
+                        }
+                    }
+                }
+
+                // Loop back to first formation (transition from last)
+                progressText.textContent = 'Rendering loop transition...';
+                for (let step = 1; step <= transitionSteps; step++) {
+                    const t = step / transitionSteps;
+                    const transitionCanvas = renderLoopTransition(visible, formationMarkerMaps, t);
+                    gif.setDelay(50);
+                    const transData = transitionCanvas.getContext('2d').getImageData(0, 0, width, height);
+                    gif.addFrame(transData.data, width, height);
+                    currentFrame++;
+                    fill.style.width = `${(currentFrame / totalFrames) * 100}%`;
+                    await new Promise(r => setTimeout(r, 10));
+                }
+
+                progressText.textContent = 'Encoding GIF...';
+                gif.finish();
+
+                const blob = new Blob([gif.getBuffer()], { type: 'image/gif' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'spds-formation.gif';
+                a.click();
+                URL.revokeObjectURL(url);
+
+                toast('GIF exported');
+            } catch (err) {
+                console.error(err);
+                toast('Export failed');
+            } finally {
+                progress.classList.remove('active');
+                fill.style.width = '0%';
+            }
+        }
+
+        function renderTransitionFrame(currentFormations, nextFormation, currentMap, nextMap, t) {
+            const { tileSize, chunkSize, chunksX, chunksY, borderWidth, primaryColor, secondaryColor, borderColor } = state.settings;
+            
+            const expCanvas = document.createElement('canvas');
+            const expCtx = expCanvas.getContext('2d');
+            expCanvas.width = chunkSize * tileSize * chunksX;
+            expCanvas.height = chunkSize * tileSize * chunksY;
+
+            // Draw background
+            if (state.settings.backgroundImage) {
+                const img = new Image();
+                img.src = state.settings.backgroundImage;
+                expCtx.globalAlpha = state.settings.imageOpacity / 100;
+                const scaledWidth = expCanvas.width * state.settings.imageScale / 100;
+                const scaledHeight = (img.height / img.width) * scaledWidth;
+                expCtx.drawImage(img, 0, 0, scaledWidth, scaledHeight);
+                expCtx.globalAlpha = 1;
+            }
+
+            // Draw grid
+            for (let cx = 0; cx < chunksX; cx++) {
+                for (let cy = 0; cy < chunksY; cy++) {
+                    for (let lx = 0; lx < chunkSize; lx++) {
+                        for (let ly = 0; ly < chunkSize; ly++) {
+                            const x = (cx * chunkSize + lx) * tileSize;
+                            const y = (cy * chunkSize + ly) * tileSize;
+                            const isBorder = lx < borderWidth || lx >= chunkSize - borderWidth ||
+                                           ly < borderWidth || ly >= chunkSize - borderWidth;
+                            expCtx.fillStyle = isBorder ? borderColor : ((cx + cy) % 2 === 0 ? primaryColor : secondaryColor);
+                            expCtx.fillRect(x, y, tileSize, tileSize);
+                            expCtx.strokeStyle = 'rgba(0,0,0,0.15)';
+                            expCtx.lineWidth = 0.5;
+                            expCtx.strokeRect(x, y, tileSize, tileSize);
+                        }
+                    }
+                    expCtx.strokeStyle = borderColor;
+                    expCtx.lineWidth = 2;
+                    expCtx.strokeRect(cx * chunkSize * tileSize, cy * chunkSize * tileSize, 
+                                   chunkSize * tileSize, chunkSize * tileSize);
+                }
+            }
+
+            // Draw existing formations (not transitioning)
+            currentFormations.forEach(formation => {
+                formation.markers.forEach(marker => {
+                    const x = marker.x * tileSize;
+                    const y = marker.y * tileSize;
+                    const size = tileSize * 0.7;
+                    drawXMarker(expCtx, x, y, size, formation.color, tileSize);
+                });
+            });
+
+            // Draw transitioning markers for next formation
+            nextFormation.markers.forEach(marker => {
+                let startX, startY;
+                const endX = marker.x;
+                const endY = marker.y;
+                
+                if (marker.name && currentMap.has(marker.name)) {
+                    const prev = currentMap.get(marker.name);
+                    startX = prev.x;
+                    startY = prev.y;
+                } else {
+                    startX = endX;
+                    startY = endY;
+                }
+                
+                const x = (startX + (endX - startX) * t) * tileSize;
+                const y = (startY + (endY - startY) * t) * tileSize;
+                const size = tileSize * 0.7;
+                
+                drawXMarker(expCtx, x, y, size, nextFormation.color, tileSize);
+            });
+
+            return expCanvas;
+        }
+
+        function renderLoopTransition(formations, formationMarkerMaps, t) {
+            const { tileSize, chunkSize, chunksX, chunksY, borderWidth, primaryColor, secondaryColor, borderColor } = state.settings;
+            
+            const expCanvas = document.createElement('canvas');
+            const expCtx = expCanvas.getContext('2d');
+            expCanvas.width = chunkSize * tileSize * chunksX;
+            expCanvas.height = chunkSize * tileSize * chunksY;
+
+            // Draw background and grid
+            if (state.settings.backgroundImage) {
+                const img = new Image();
+                img.src = state.settings.backgroundImage;
+                expCtx.globalAlpha = state.settings.imageOpacity / 100;
+                const scaledWidth = expCanvas.width * state.settings.imageScale / 100;
+                const scaledHeight = (img.height / img.width) * scaledWidth;
+                expCtx.drawImage(img, 0, 0, scaledWidth, scaledHeight);
+                expCtx.globalAlpha = 1;
+            }
+
+            for (let cx = 0; cx < chunksX; cx++) {
+                for (let cy = 0; cy < chunksY; cy++) {
+                    for (let lx = 0; lx < chunkSize; lx++) {
+                        for (let ly = 0; ly < chunkSize; ly++) {
+                            const x = (cx * chunkSize + lx) * tileSize;
+                            const y = (cy * chunkSize + ly) * tileSize;
+                            const isBorder = lx < borderWidth || lx >= chunkSize - borderWidth ||
+                                           ly < borderWidth || ly >= chunkSize - borderWidth;
+                            expCtx.fillStyle = isBorder ? borderColor : ((cx + cy) % 2 === 0 ? primaryColor : secondaryColor);
+                            expCtx.fillRect(x, y, tileSize, tileSize);
+                            expCtx.strokeStyle = 'rgba(0,0,0,0.15)';
+                            expCtx.lineWidth = 0.5;
+                            expCtx.strokeRect(x, y, tileSize, tileSize);
+                        }
+                    }
+                    expCtx.strokeStyle = borderColor;
+                    expCtx.lineWidth = 2;
+                    expCtx.strokeRect(cx * chunkSize * tileSize, cy * chunkSize * tileSize, 
+                                   chunkSize * tileSize, chunkSize * tileSize);
+                }
+            }
+
+            // Transition all markers from last state to first formation
+            const lastMap = formationMarkerMaps[formationMarkerMaps.length - 1].map;
+            const firstFormation = formations[0];
+            const firstMap = formationMarkerMaps[0].map;
+
+            firstFormation.markers.forEach(marker => {
+                let startX, startY;
+                const endX = marker.x;
+                const endY = marker.y;
+                
+                if (marker.name && lastMap.has(marker.name)) {
+                    const prev = lastMap.get(marker.name);
+                    startX = prev.x;
+                    startY = prev.y;
+                } else {
+                    startX = endX;
+                    startY = endY;
+                }
+                
+                const x = (startX + (endX - startX) * t) * tileSize;
+                const y = (startY + (endY - startY) * t) * tileSize;
+                const size = tileSize * 0.7;
+                
+                drawXMarker(expCtx, x, y, size, firstFormation.color, tileSize);
+            });
+
+            return expCanvas;
+        }
+
+        // ============================================
+        // STORAGE
+        // ============================================
+        function saveToStorage() {
+            const data = {
+                formations: state.formations,
+                settings: state.settings,
+                activeFormationId: state.activeFormationId
+            };
+            localStorage.setItem('spdsFormationDesigner', JSON.stringify(data));
+        }
+
+        function loadFromStorage() {
+            let saved = localStorage.getItem('spdsFormationDesigner');
+            if (!saved) {
+                saved = localStorage.getItem('formationMaker');
+            }
+            
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    if (data.formations) state.formations = data.formations;
+                    if (data.settings) state.settings = { ...state.settings, ...data.settings };
+                    if (data.activeFormationId) state.activeFormationId = data.activeFormationId;
+                } catch (e) {}
+            }
+        }
+
+        // ============================================
+        // GIF ENCODER
+        // ============================================
+        class GIFEncoder {
+            constructor(width, height) {
+                this.width = width;
+                this.height = height;
+                this.frames = [];
+                this.delay = 100;
+                this.repeat = 0;
+            }
+
+            setDelay(d) { this.delay = d; }
+            setRepeat(r) { this.repeat = r; }
+            start() { this.frames = []; }
+
+            addFrame(pixels, w, h) {
+                const { palette, indexed } = this.quantize(pixels);
+                this.frames.push({ palette, indexed, delay: this.delay });
+            }
+
+            quantize(pixels) {
+                const colorMap = new Map();
+                const indexed = new Uint8Array(this.width * this.height);
+
+                for (let i = 0; i < pixels.length; i += 4) {
+                    const r = pixels[i], g = pixels[i + 1], b = pixels[i + 2];
+                    // Reduce color precision for better quantization
+                    const qr = Math.round(r / 4) * 4;
+                    const qg = Math.round(g / 4) * 4;
+                    const qb = Math.round(b / 4) * 4;
+                    const key = (qr << 16) | (qg << 8) | qb;
+
+                    if (!colorMap.has(key) && colorMap.size < 256) {
+                        colorMap.set(key, colorMap.size);
+                    }
+
+                    let idx = colorMap.get(key);
+                    if (idx === undefined) {
+                        let minDist = Infinity;
+                        colorMap.forEach((val, k) => {
+                            const cr = (k >> 16) & 0xff, cg = (k >> 8) & 0xff, cb = k & 0xff;
+                            const dist = (qr - cr) ** 2 + (qg - cg) ** 2 + (qb - cb) ** 2;
+                            if (dist < minDist) { minDist = dist; idx = val; }
+                        });
+                    }
+                    indexed[i / 4] = idx;
+                }
+
+                const palette = new Uint8Array(256 * 3);
+                colorMap.forEach((idx, key) => {
+                    palette[idx * 3] = (key >> 16) & 0xff;
+                    palette[idx * 3 + 1] = (key >> 8) & 0xff;
+                    palette[idx * 3 + 2] = key & 0xff;
+                });
+
+                return { palette, indexed };
+            }
+
+            finish() {}
+
+            getBuffer() {
+                const buf = [];
+                const write = (...bytes) => buf.push(...bytes);
+                const writeStr = (s) => s.split('').forEach(c => buf.push(c.charCodeAt(0)));
+
+                writeStr('GIF89a');
+                write(this.width & 0xff, (this.width >> 8) & 0xff);
+                write(this.height & 0xff, (this.height >> 8) & 0xff);
+                write(0xf7, 0, 0);
+
+                if (this.frames.length > 0) {
+                    for (let i = 0; i < 256; i++) {
+                        write(this.frames[0].palette[i * 3] || 0,
+                              this.frames[0].palette[i * 3 + 1] || 0,
+                              this.frames[0].palette[i * 3 + 2] || 0);
+                    }
+                }
+
+                write(0x21, 0xff, 0x0b);
+                writeStr('NETSCAPE2.0');
+                write(0x03, 0x01, this.repeat & 0xff, (this.repeat >> 8) & 0xff, 0x00);
+
+                for (const frame of this.frames) {
+                    write(0x21, 0xf9, 0x04, 0x00);
+                    const delayCs = Math.round(frame.delay / 10);
+                    write(delayCs & 0xff, (delayCs >> 8) & 0xff, 0x00, 0x00);
+
+                    write(0x2c, 0, 0, 0, 0);
+                    write(this.width & 0xff, (this.width >> 8) & 0xff);
+                    write(this.height & 0xff, (this.height >> 8) & 0xff);
+                    write(0x00);
+
+                    const lzw = this.lzwEncode(frame.indexed, 8);
+                    write(8);
+                    for (let i = 0; i < lzw.length; i += 255) {
+                        const chunk = lzw.slice(i, i + 255);
+                        write(chunk.length, ...chunk);
+                    }
+                    write(0x00);
+                }
+
+                write(0x3b);
+                return new Uint8Array(buf);
+            }
+
+            lzwEncode(pixels, minCodeSize) {
+                const clear = 1 << minCodeSize;
+                const eoi = clear + 1;
+                let codeSize = minCodeSize + 1;
+                let nextCode = eoi + 1;
+
+                const dict = new Map();
+                for (let i = 0; i < clear; i++) dict.set(String.fromCharCode(i), i);
+
+                const output = [];
+                let bitBuf = 0, bitCount = 0;
+
+                const writeCode = (code) => {
+                    bitBuf |= code << bitCount;
+                    bitCount += codeSize;
+                    while (bitCount >= 8) {
+                        output.push(bitBuf & 0xff);
+                        bitBuf >>= 8;
+                        bitCount -= 8;
+                    }
+                };
+
+                writeCode(clear);
+
+                let prefix = '';
+                for (let i = 0; i < pixels.length; i++) {
+                    const c = String.fromCharCode(pixels[i]);
+                    const combined = prefix + c;
+
+                    if (dict.has(combined)) {
+                        prefix = combined;
+                    } else {
+                        writeCode(dict.get(prefix));
+                        if (nextCode < 4096) {
+                            dict.set(combined, nextCode++);
+                            if (nextCode > (1 << codeSize) && codeSize < 12) codeSize++;
+                        }
+                        prefix = c;
+                    }
+                }
+
+                if (prefix) writeCode(dict.get(prefix));
+                writeCode(eoi);
+                if (bitCount > 0) output.push(bitBuf & 0xff);
+
+                return output;
+            }
+        }
+    </script>
+</body>
+</html>
