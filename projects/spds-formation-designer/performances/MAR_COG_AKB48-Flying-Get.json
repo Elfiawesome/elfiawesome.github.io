@@ -1,0 +1,342 @@
+{
+  "version": "2.0",
+  "appName": "SPDS Formation Designer",
+  "formations": [
+    {
+      "id": "a4qdup2pq",
+      "name": "Formation 1",
+      "color": "#d4ff00",
+      "visible": true,
+      "markers": [
+        {
+          "id": "a4keng4zn",
+          "x": 28,
+          "y": 30,
+          "name": "Chun Wah"
+        },
+        {
+          "id": "mt3qajygu",
+          "x": 16,
+          "y": 26,
+          "name": "Ernest"
+        },
+        {
+          "id": "nipcjdx6t",
+          "x": 20,
+          "y": 30,
+          "name": "Rui Yu"
+        },
+        {
+          "id": "jdko68hmy",
+          "x": 24,
+          "y": 34,
+          "name": "Rafiqin"
+        },
+        {
+          "id": "jfhfzzjko",
+          "x": 24,
+          "y": 26,
+          "name": "Nicholas"
+        },
+        {
+          "id": "ew3yqavn9",
+          "x": 28,
+          "y": 38,
+          "name": "Shi En"
+        },
+        {
+          "id": "oayrdggfp",
+          "x": 32,
+          "y": 30,
+          "name": "Elfiyan"
+        },
+        {
+          "id": "xuudr5s06",
+          "x": 32,
+          "y": 38,
+          "name": "Jayden"
+        },
+        {
+          "id": "e2io6174g",
+          "x": 36,
+          "y": 26,
+          "name": "Ilhan"
+        },
+        {
+          "id": "za7mnd4b9",
+          "x": 36,
+          "y": 34,
+          "name": "Jonas"
+        },
+        {
+          "id": "jfrdo2p9d",
+          "x": 40,
+          "y": 30,
+          "name": "Aldan"
+        },
+        {
+          "id": "qwqnh0q6a",
+          "x": 44,
+          "y": 26,
+          "name": "Dominic"
+        }
+      ]
+    },
+    {
+      "id": "ya3cutgs4",
+      "name": "Formation 2",
+      "color": "#280bfe",
+      "visible": true,
+      "markers": [
+        {
+          "id": "g3ta21tgo",
+          "x": 30,
+          "y": 32,
+          "name": "Chun Wah"
+        },
+        {
+          "id": "g7q19t6r1",
+          "x": 24,
+          "y": 20,
+          "name": "Ernest"
+        },
+        {
+          "id": "mob9jxdo0",
+          "x": 24,
+          "y": 28,
+          "name": "Rui Yu"
+        },
+        {
+          "id": "1xpc29anz",
+          "x": 24,
+          "y": 36,
+          "name": "Rafiqin"
+        },
+        {
+          "id": "8eesylte6",
+          "x": 30,
+          "y": 24,
+          "name": "Nicholas"
+        },
+        {
+          "id": "dar0oo0yz",
+          "x": 30,
+          "y": 40,
+          "name": "Shi En"
+        },
+        {
+          "id": "ysnajl0fv",
+          "x": 30,
+          "y": 28,
+          "name": "Elfiyan"
+        },
+        {
+          "id": "xfibgfgsw",
+          "x": 30,
+          "y": 36,
+          "name": "Jayden"
+        },
+        {
+          "id": "j3gz7wiqq",
+          "x": 30,
+          "y": 20,
+          "name": "Ilhan"
+        },
+        {
+          "id": "jh8zt93i9",
+          "x": 36,
+          "y": 36,
+          "name": "Jonas"
+        },
+        {
+          "id": "0agkav73p",
+          "x": 36,
+          "y": 28,
+          "name": "Aldan"
+        },
+        {
+          "id": "czujmtf5d",
+          "x": 36,
+          "y": 20,
+          "name": "Dominic"
+        }
+      ]
+    },
+    {
+      "id": "cxji1rbga",
+      "name": "Formation 3",
+      "color": "#ff2424",
+      "visible": true,
+      "markers": [
+        {
+          "id": "n588fva32",
+          "x": 24,
+          "y": 26,
+          "name": "Ernest"
+        },
+        {
+          "id": "bcdi5sq3n",
+          "x": 24,
+          "y": 30,
+          "name": "Rui Yi"
+        },
+        {
+          "id": "00l3bdd49",
+          "x": 24,
+          "y": 34,
+          "name": "Rui Yi"
+        },
+        {
+          "id": "ub2p82ky1",
+          "x": 27,
+          "y": 24,
+          "name": "Nicholas"
+        },
+        {
+          "id": "avhwi2eki",
+          "x": 26,
+          "y": 36,
+          "name": "Shi En"
+        },
+        {
+          "id": "7c0g5v0iz",
+          "x": 28,
+          "y": 30,
+          "name": "Chun Wah"
+        },
+        {
+          "id": "bmjraf0wx",
+          "x": 32,
+          "y": 30,
+          "name": "Elfiyan"
+        },
+        {
+          "id": "3f319dmpz",
+          "x": 34,
+          "y": 36,
+          "name": "Jayden"
+        },
+        {
+          "id": "opdya9mvj",
+          "x": 34,
+          "y": 24,
+          "name": "Ilhan"
+        },
+        {
+          "id": "eelgb5e34",
+          "x": 36,
+          "y": 34,
+          "name": "Jonas"
+        },
+        {
+          "id": "588am9wth",
+          "x": 36,
+          "y": 30,
+          "name": "Aldan"
+        },
+        {
+          "id": "5c3tkrdxb",
+          "x": 36,
+          "y": 26,
+          "name": "Dominic"
+        }
+      ]
+    },
+    {
+      "id": "yqgsgiyzt",
+      "name": "Silent Wave",
+      "color": "#04ff00",
+      "visible": true,
+      "markers": [
+        {
+          "id": "qv9csfqt4",
+          "x": 13,
+          "y": 42,
+          "name": "Ernest"
+        },
+        {
+          "id": "9vw64d1ed",
+          "x": 16,
+          "y": 40,
+          "name": "Rui Yi"
+        },
+        {
+          "id": "b58kgglag",
+          "x": 19,
+          "y": 42,
+          "name": "Rafiqin"
+        },
+        {
+          "id": "otgr73gzj",
+          "x": 22,
+          "y": 40,
+          "name": "Nicholas"
+        },
+        {
+          "id": "fqb2suxsh",
+          "x": 25,
+          "y": 42,
+          "name": "Shi En"
+        },
+        {
+          "id": "7yrig9far",
+          "x": 28,
+          "y": 40,
+          "name": "Chun Wah"
+        },
+        {
+          "id": "yjhhh5n1r",
+          "x": 31,
+          "y": 42,
+          "name": "Elfiyan"
+        },
+        {
+          "id": "0haw8uzkm",
+          "x": 34,
+          "y": 40,
+          "name": "Jayden"
+        },
+        {
+          "id": "rwlsj0ut0",
+          "x": 37,
+          "y": 42,
+          "name": "Ilhan"
+        },
+        {
+          "id": "a1lsvn8o3",
+          "x": 40,
+          "y": 40,
+          "name": "Jonas"
+        },
+        {
+          "id": "mqci6b45n",
+          "x": 43,
+          "y": 42,
+          "name": "Aldan"
+        },
+        {
+          "id": "wa1a2jf17",
+          "x": 46,
+          "y": 40,
+          "name": "Dominic"
+        }
+      ]
+    }
+  ],
+  "settings": {
+    "tileSize": 32,
+    "chunkSize": 20,
+    "chunksX": 3,
+    "chunksY": 3,
+    "borderWidth": 1,
+    "primaryColor": "#a89ea9",
+    "secondaryColor": "#8e98a5",
+    "borderColor": "#cececf",
+    "gifDuration": 1000,
+    "transitionSteps": 10,
+    "backgroundImage": null,
+    "imageOpacity": 50,
+    "imageScale": 100
+  },
+  "activeFormationId": "yqgsgiyzt"
+}
